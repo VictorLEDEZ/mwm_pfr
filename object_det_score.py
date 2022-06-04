@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
-os.chdir("./darkflow-master")
+os.chdir("./darkflow-mast")
 
 
 def thema(res):
