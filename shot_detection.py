@@ -6,6 +6,7 @@ import plotly.express as px
 import os
 from pathlib import Path
 from tqdm import tqdm
+import platform
 
 
 
@@ -18,17 +19,17 @@ from tqdm import tqdm
 
 def color_hist(file_path,previous_hist):
 
-    ###########################################################################################
-    # Function to calculate the color difference histogram between two consecutive frames
-    #
-    # Input:
-    #       - file path: path of the video
-    #       - previous_hist: colour histogram of the last frame of the previous video
-    # Output:
-    #       - list_diff: array of color difference histogram
-    #       - fps : frame rate of the video
-    #       - last_frame_hist: colour histogram of the last frame of the current video
-    ###########################################################################################
+    """
+    Function to calculate the color difference histogram between two consecutive frames
+
+    Input:
+           - file path: path of the video
+           - previous_hist: colour histogram of the last frame of the previous video
+    Output:
+           - list_diff: array of color difference histogram
+           - fps : frame rate of the video
+           - last_frame_hist: colour histogram of the last frame of the current video
+    """
 
 
     cap = cv2.VideoCapture(file_path)
@@ -51,17 +52,46 @@ def color_hist(file_path,previous_hist):
     return list_diff,fps,last_frame_hist
 
 
+def ordering_videos(dir_path):
+    """
+    Function to order videos by last modification date (in epoch time format).
+    useful to keep the videos consistent.
+
+    Input:
+            - dir_path: path of the videos directory
+    Output:
+            - videos_order: array of video's filename ordering by last modification date
+    """
+    videos_order={}                                             #dict -> key:filename / value: Datetime in epoch Time
+    for file in os.listdir(dir_path):
+        if not file.startswith('.'):                                                        # avoid hidden files
+            if platform.system() == 'Windows':
+                video_dateTime= os.path.getctime(dir_path+'/'+file)
+            else:
+                stat = os.stat(dir_path+'/'+file)
+                try:
+                    video_dateTime= stat.st_birthtime
+                except AttributeError:
+                    # We're probably on Linux. No easy way to get creation dates here,
+                    # so we'll settle for when its content was last modified.
+                    video_dateTime=stat.st_mtime
+            videos_order[file]=video_dateTime
+    videos_order=list(dict(sorted(videos_order.items(), key=lambda item: item[1])).keys())  # list of filename
+                                                                                            # ordering dict by dateTime
+    return videos_order
+
+
 def compute_videos_hist(dir_path):
 
-    ###########################################################################################
-    # Function to calculate the color difference histogram for all the videos in the directory
-    #
-    # Input:
-    #       dir_path: path of the videos directory
-    # Output:
-    #       total_list_hist: array of color difference histogram for all videos
-    #       dict_video_endIndex_fps: dictionary -> key:video last frame index / value: fps
-    ###########################################################################################
+    """
+    Function to calculate the color difference histogram for all the videos in the directory
+
+     Input:
+           dir_path: path of the videos directory
+     Output:
+           total_list_hist: array of color difference histogram for all videos
+           dict_video_endIndex_fps: dictionary -> key:video last frame index / value: fps
+    """
 
 
     total_list_hist=[]                  #color histogram difference for all the videos
@@ -69,8 +99,9 @@ def compute_videos_hist(dir_path):
     last_frame_index=0                  #init for last frame video index
     previous_hist=np.zeros((8,8,8))     #init for first frame diff calculation
 
-    files=[name for name in os.listdir(dir_path) if not name.startswith('.')]   #list video files in directory
-    pbar = tqdm(desc='Video',total=len(files),position=0, leave=True)           # create loading bar
+    #files=[name for name in os.listdir(dir_path) if not name.startswith('.')]   #list video files in directory
+    files= ordering_videos(dir_path)                                            #list of files in datetime order
+    pbar = tqdm(desc='Video',total=len(files),position=0, leave=True)           #create loading bar
 
     for filename in files:              #loop over all videos in the directory
         pbar.set_description(f'Videos -> {filename}')
@@ -87,15 +118,15 @@ def compute_videos_hist(dir_path):
 
 def visualization(total_list_hist,shots):
 
-    ###########################################################################################
-    # Function to visualize shots selection depending on color difference histogram
-    #
-    # Input:
-    #       total_list_hist: array of color difference histogram for all videos
-    #       shots: array of frame index selected as shots separation
-    # Output:
-    #       plot figure
-    ###########################################################################################
+    """
+     Function to visualize shots selection depending on color difference histogram
+
+     Input:
+           total_list_hist: array of color difference histogram for all videos
+           shots: array of frame index selected as shots separation
+     Output:
+           plot figure
+    """
 
 
     df=pd.DataFrame() #init dataframe
@@ -110,17 +141,17 @@ def visualization(total_list_hist,shots):
 
 def define_shots(dir_path,nb_shots,range_min=1,show_viz=False):
 
-    ###########################################################################################
-    # Main function. Divide color difference histogram into a number of shots passed in inout parameter
-    #
-    # Input:
-    #       dir_path: path of the videos directory
-    #       nb_shots: integer for the number of shots to return
-    #       range_min: integer -> number of FPS for minimum shot length
-    #       show_viz: Boolean -> to visualize shots selection depending on color difference histogram
-    # Output:
-    #       shots: array of frame index defined as shots separations
-    ###########################################################################################
+    """
+     Main function. Divide color difference histogram into a number of shots passed in inout parameter
+
+     Input:
+           dir_path: path of the videos directory
+           nb_shots: integer for the number of shots to return
+           range_min: integer -> number of FPS for minimum shot length
+           show_viz: Boolean -> to visualize shots selection depending on color difference histogram
+     Output:
+           shots: array of frame index defined as shots separations
+    """
 
 
     total_list_hist,dict_video_endIndex_fps=compute_videos_hist(dir_path) #call function to calculate the color
