@@ -9,7 +9,7 @@ import time
 import imageio
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
-def Flow(video_path, display = False, save_video = False):
+def Flow(video_path, display = False, save_video = False, sampling_rate=10):
 
     def draw_flow(img, flow, step=16):
 
@@ -57,48 +57,54 @@ def Flow(video_path, display = False, save_video = False):
     img_lst = []
     img_lst2 = []
     flow_mean = []
+    sampling_rate = 10
+    frame_number = 0
 
-    while True:
+    while suc:
+        if frame_number%sampling_rate==0:
+            # print(frame_number)
+            img = cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+            suc, img = cap.read()
 
-        suc, img = cap.read()
+            if img is None :
+                break
 
-        if img is None :
-            break
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # start time to calculate FPS
+            start = time.time()
 
-        # start time to calculate FPS
-        start = time.time()
+            flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+            flow_mean.append(np.mean(np.abs(flow)))
+            
+            prevgray = gray
 
-        flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-        flow_mean.append(np.mean(np.abs(flow)))
-        
-        prevgray = gray
+            # End time
+            end = time.time()
 
-        # End time
-        end = time.time()
+            # calculate the FPS for current frame detection
+            fps = 1 / (end-start)
+            # print(f"{fps:.2f} FPS")
 
-        # calculate the FPS for current frame detection
-        fps = 1 / (end-start)
-        # print(f"{fps:.2f} FPS")
+            if save_video == True :
+                img_lst.append(draw_flow(gray, flow))
+                img_lst2.append(draw_hsv(flow))
 
-        if save_video == True :
-            img_lst.append(draw_flow(gray, flow))
-            img_lst2.append(draw_hsv(flow))
+            if display == True :
+                cv2.imshow('flow', draw_flow(gray, flow))
+                cv2.imshow('flow HSV', draw_hsv(flow))
 
-        if display == True :
-            cv2.imshow('flow', draw_flow(gray, flow))
-            cv2.imshow('flow HSV', draw_hsv(flow))
+            if cv2.waitKey(5) & 0xFF == ord('q'):
+                break
 
-        if cv2.waitKey(5) & 0xFF == ord('q'):
-            break
+        frame_number += 1
 
     cap.release()
     cv2.destroyAllWindows()
 
     if display == True :
-        frame_number = [i for i in range(0, len(flow_mean))]
-        d = {'Frame number':frame_number,'Flow mean':flow_mean}
+        frames = [i for i in range(0, len(flow_mean))]
+        d = {'Frame number':frames,'Flow mean':flow_mean}
         df = pd.DataFrame(d)
 
         fig = px.bar(df, x='Frame number', y='Flow mean')
@@ -108,7 +114,12 @@ def Flow(video_path, display = False, save_video = False):
         imageio.mimsave(os.path.join(data_path, "flow.gif"), img_lst)
         imageio.mimsave(os.path.join(data_path, "flow_hsv.gif"), img_lst2)
 
-    return normalize(np.array(flow_mean))
+    for i in flow_mean:
+        for j in range(sampling_rate):
+            flow_mean = np.append(flow_mean, i)
+    flow_mean = normalize(np.array(flow_mean))
+
+    return flow_mean
 
 
 # # Video Path

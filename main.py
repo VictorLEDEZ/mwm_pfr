@@ -26,7 +26,7 @@ def agregation(flow=flow, sift=sift, obj=obj_score, flow_coef = 1, sift_coef=1, 
 
 agreg = agregation(flow=flow, sift=sift, obj=obj_score, flow_coef=1, sift_coef=1, obj_coef=1)
 shots = define_shots(video_path, nb_shots=10)
-shots_order = shots_order(shots, agregation, display=True)
+shots_order, df_order = shots_order(shots, agregation, display=True)
 
 ### To remove ###
 import plotly.express as px
