@@ -7,8 +7,6 @@ import sys
 import os
 import itertools
 
-os.chdir("./darkflow-mast")
-
 
 def thema(res):
     '''
