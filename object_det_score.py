@@ -5,6 +5,7 @@ from darkflow.net.build import TFNet
 import matplotlib.pyplot as plt
 import sys
 import os
+import itertools
 
 os.chdir("./darkflow-mast")
 
@@ -101,10 +102,54 @@ def frame_score(res, row, col):
     return score
 
 
-def object_det_score(video_path, model_path="cfg/yolo.cfg", weights_path="bin/yolo.weights", thresold_pred=0.6, gpu=0):
+# def object_det_score(video_path, model_path="cfg/yolo.cfg", weights_path="bin/yolo.weights", thresold_pred=0.6, gpu=0):
+#     '''
+#     fonction qui renvoie le score pour toutes les frames d'une vidéo
+#     video_path : chemin de la vidéo à analyser (string)
+#     model_path : chemin vers le modèle de détection d'objets YOLO (string)
+#     weights_path : chemin vers les poids du modèle (string)
+#     treshold_pred : seuil de confiance au delà duquel l'objet est détecté (float compris entre 0 et 1)
+#     gpu : valeur égale à 1 si le modèle utilise un GPU sinon 0 (float)
+#     return : une liste correspondant aux résultats de la détection d'objets dans chaque frame de la vidéo 
+#     et une liste correspondant aux scores dans chaque frame de la vidéo
+#     '''
+#     options = {"model": model_path, 
+#            "load": weights_path, 
+#            "threshold": thresold_pred,
+#            'gpu': gpu}
+
+#     frame_scores = []
+#     results_object_det = []
+
+#     tfnet = TFNet(options)
+#     cap = cv2.VideoCapture(video_path)
+
+#     while(cap.isOpened()):
+#         ret, frame = cap.read()
+#         if ret:
+#             row = frame.shape[0]
+#             col = frame.shape[1]
+#             results = tfnet.return_predict(frame)
+#             new_results = thema(results)
+#             frame_scores.append(frame_score(new_results, row, col))
+#             results_object_det.append(new_results)
+#             if cv2.waitKey(1)  & 0xFF == ord('q'):
+#                 break
+#         else:
+#             break
+    
+#     cap.release()
+#     cv2.destroyAllWindows()
+
+#     normed_scores = [float(i)/max(frame_scores) for i in frame_scores]
+
+#     return results_object_det, normed_scores
+
+
+def object_det_score(frame_list, model_path="cfg/yolo.cfg", weights_path="bin/yolo.weights", thresold_pred=0.6, gpu=0):
     '''
     fonction qui renvoie le score pour toutes les frames d'une vidéo
-    video_path : chemin de la vidéo à analyser (string)
+    frame_list: liste de frames (list)
     model_path : chemin vers le modèle de détection d'objets YOLO (string)
     weights_path : chemin vers les poids du modèle (string)
     treshold_pred : seuil de confiance au delà duquel l'objet est détecté (float compris entre 0 et 1)
@@ -121,24 +166,15 @@ def object_det_score(video_path, model_path="cfg/yolo.cfg", weights_path="bin/yo
     results_object_det = []
 
     tfnet = TFNet(options)
-    cap = cv2.VideoCapture(video_path)
+    frame_list = list(itertools.chain(*frame_list)) 
 
-    while(cap.isOpened()):
-        ret, frame = cap.read()
-        if ret:
-            row = frame.shape[0]
-            col = frame.shape[1]
-            results = tfnet.return_predict(frame)
-            new_results = thema(results)
-            frame_scores.append(frame_score(new_results, row, col))
-            results_object_det.append(new_results)
-            if cv2.waitKey(1)  & 0xFF == ord('q'):
-                break
-        else:
-            break
-    
-    cap.release()
-    cv2.destroyAllWindows()
+    for frame in frame_list:
+        row = frame.shape[0]
+        col = frame.shape[1]
+        results = tfnet.return_predict(frame)
+        new_results = thema(results)
+        frame_scores.append(frame_score(new_results, row, col))
+        results_object_det.append(new_results)
 
     normed_scores = [float(i)/max(frame_scores) for i in frame_scores]
 
