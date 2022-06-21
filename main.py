@@ -6,6 +6,7 @@ import numpy as np
 import sys
 import os
 import platform
+import score from score
 
 
 def ordering_videos(dir_path):
@@ -125,8 +126,8 @@ if __name__ == '__main__':
 
     dir_path = sys.argv[1]
     summary_filename = sys.argv[2]
-    summary_duration = sys.argv[3]
-    shot_percentage = sys.argv[4]
+    summary_duration = int(sys.argv[3])
+    shot_percentage = int(sys.argv[4])
 
     videos_order = ordering_videos(dir_path)
 
@@ -137,10 +138,7 @@ if __name__ == '__main__':
 
     summary_fps, summary_resolution = summary_param(videos_param)
 
-    #######
-    # ADD SHOTS ORDER
-    # dict_shots_order=
-    ####
+    dict_shots_order= score(frames_list, shots, sampling_rate=10)
 
     min_shot_nb = len(videos_param)
 
