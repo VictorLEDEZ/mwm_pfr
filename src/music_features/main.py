@@ -25,6 +25,8 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
     offset_start = round(abs(beat_start - picked_segments[0]['t_start']), 1)
     offset_end = round(abs(picked_segments[-1]['t_end'] - beat_end), 1)
 
+    cut_music(beat_start, beat_end, audio_path)
+
     # print the results
     if (printing == True):
         print('----------------------------------------------------------------------')
@@ -72,7 +74,5 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
         plt.xlabel('Time in seconds')
         plt.ylabel('Amplitude')
         plt.show()
-
-    cut_music(beat_start, beat_end, audio_path)
 
     return all_segments, picked_segments, beat_start, beat_peak, beat_end, offset_start, offset_end
