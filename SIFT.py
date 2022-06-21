@@ -8,13 +8,14 @@ import time
 import imageio
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
-def Sift(video_path, display = False, save_video = False, sampling_rate=10) :     # Changer gestion de path de save_video
+def Sift(frame_list, frame_shift=1, display = False, save_video = False, sampling_rate=10) :     # Changer gestion de path de save_video
 
+    print("Processing SIFT...")
     def normalize(sift_mean):
         return (sift_mean - np.min(sift_mean)) / (np.max(sift_mean) - np.min(sift_mean))
 
-    vidcap = cv2.VideoCapture(video_path)
-    success, image = vidcap.read()
+    # vidcap = cv2.VideoCapture(video_path)
+    # success, image = vidcap.read()
 
     #sift
     sift = cv2.SIFT_create()
@@ -22,8 +23,8 @@ def Sift(video_path, display = False, save_video = False, sampling_rate=10) :   
     #feature matching
     bf = cv2.BFMatcher.create(cv2.NORM_L2, crossCheck=True)
 
-    cap = cv2.VideoCapture(video_path)
-    cap2 = cv2.VideoCapture(video_path)
+    # cap = cv2.VideoCapture(video_path)
+    # cap2 = cv2.VideoCapture(video_path)
 
     if save_video == True :
         # Write video
@@ -33,16 +34,17 @@ def Sift(video_path, display = False, save_video = False, sampling_rate=10) :   
     # length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     img_lst = []
-    frame_number = 0
-    frame_shift = 1
     sift_mean = []
+    sift_mean2 = []
+    frame_number = 0
+    frame_list2 = frame_list
 
-    while success:
+    for frame_number in range(len(frame_list)):
         if frame_number%sampling_rate==0:
-            current_frame = cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
-            next_frame = cap2.set(cv2.CAP_PROP_POS_FRAMES, frame_number+frame_shift)
-            success, current_frame = cap.read()
-            success2, next_frame = cap2.read()
+            current_frame = np.array(frame_list[frame_number])
+            next_frame = np.array(frame_list[frame_number+frame_shift])
+            # success, current_frame = frame_list.read()
+            # success2, next_frame = frame_list2.read()
 
             if next_frame is None :
                 break
@@ -80,13 +82,12 @@ def Sift(video_path, display = False, save_video = False, sampling_rate=10) :   
                 # Write video
                 out.write(img3)
 
-            if cv2.waitKey(5) & 0xFF == ord('q'):
-                break
+            # if cv2.waitKey(5) & 0xFF == ord('q'):
+            #     break
 
-        frame_number += 1
+    frame_number += 1
 
-    cv2.destroyAllWindows()
-    cap.release()
+
 
     if save_video == True :
         out.release()
@@ -103,10 +104,15 @@ def Sift(video_path, display = False, save_video = False, sampling_rate=10) :   
 
     for i in sift_mean:
         for j in range(sampling_rate):
-            sift_mean = np.append(sift_mean, i)
-    sift_mean = normalize(np.array(sift_mean))
+            sift_mean2 = np.append(sift_mean2, i)
+    # sift_mean = normalize(np.array(sift_mean))
+    sift_mean2 = sift_mean2[:len(frame_list)]
+    # print(int(video.get(cv2.CAP_PROP_FRAME_COUNT)))
+    print("Done.")
+    return sift_mean2
 
-    return sift_mean
+    # cv2.destroyAllWindows()
+    # cap.release()
 
 # # Video Path
 # data_path = os.path.join(Path(os.getcwd()).parent.absolute(), "Data")

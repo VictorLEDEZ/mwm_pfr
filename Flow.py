@@ -1,16 +1,16 @@
-import torch
-import cv2
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import cv2
 import os
 from pathlib import Path
 import time
 import imageio
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 
-def Flow(video_path, display = False, save_video = False, sampling_rate=10):
+def Flow(frame_list, frame_shift=1, display = False, save_video = False, sampling_rate=10):
 
+    print("Processing Optical Flow...")
     def draw_flow(img, flow, step=16):
 
         h, w = img.shape[:2]
@@ -48,36 +48,44 @@ def Flow(video_path, display = False, save_video = False, sampling_rate=10):
     def normalize(flow_mean):
         return (flow_mean - np.min(flow_mean)) / (np.max(flow_mean) - np.min(flow_mean))
 
+    
+    # cap = cv2.VideoCapture(video_path)
 
-    cap = cv2.VideoCapture(video_path)
-
-    suc, prev = cap.read()
-    prevgray = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
-
+    # suc, prev = cap.read()
     img_lst = []
     img_lst2 = []
     flow_mean = []
-    sampling_rate = 10
+    flow_mean2 = []
     frame_number = 0
 
-    while suc:
+    # while suc:
+    for frame_number in range(len(frame_list)):
         if frame_number%sampling_rate==0:
-            # print(frame_number)
-            img = cap.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
-            suc, img = cap.read()
-
-            if img is None :
+            current_frame = np.array(frame_list[frame_number])
+            next_frame = np.array(frame_list[frame_number+frame_shift])
+            # prevgray = cv2.cvtColor(np.array(video[frame_number]), cv2.COLOR_BGR2GRAY)
+            if next_frame is None :
                 break
 
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            # print(frame_number)
+            # img = frame_list.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+            # img = np.array(video[frame_number])
+            # suc, img = cap.read()
 
+            # if img is None :
+            #     break
+
+            # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            current_frame = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
+            next_frame = cv2.cvtColor(next_frame, cv2.COLOR_BGR2GRAY)    
             # start time to calculate FPS
             start = time.time()
 
-            flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+            # flow = cv2.calcOpticalFlowFarneback(prevgray, gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+            flow = cv2.calcOpticalFlowFarneback(current_frame, next_frame, None, 0.5, 3, 15, 3, 5, 1.2, 0)
             flow_mean.append(np.mean(np.abs(flow)))
             
-            prevgray = gray
+            # prevgray = gray
 
             # End time
             end = time.time()
@@ -87,20 +95,17 @@ def Flow(video_path, display = False, save_video = False, sampling_rate=10):
             # print(f"{fps:.2f} FPS")
 
             if save_video == True :
-                img_lst.append(draw_flow(gray, flow))
+                img_lst.append(draw_flow(next_frame, flow))
                 img_lst2.append(draw_hsv(flow))
 
             if display == True :
-                cv2.imshow('flow', draw_flow(gray, flow))
+                cv2.imshow('flow', draw_flow(next_frame, flow))
                 cv2.imshow('flow HSV', draw_hsv(flow))
 
-            if cv2.waitKey(5) & 0xFF == ord('q'):
-                break
+            # if cv2.waitKey(5) & 0xFF == ord('q'):
+            #     break
 
-        frame_number += 1
-
-    cap.release()
-    cv2.destroyAllWindows()
+        # frame_number += 1
 
     if display == True :
         frames = [i for i in range(0, len(flow_mean))]
@@ -116,11 +121,15 @@ def Flow(video_path, display = False, save_video = False, sampling_rate=10):
 
     for i in flow_mean:
         for j in range(sampling_rate):
-            flow_mean = np.append(flow_mean, i)
-    flow_mean = normalize(np.array(flow_mean))
+            flow_mean2 = np.append(flow_mean2, i)
+    # flow_mean = normalize(np.array(flow_mean))
+    flow_mean2 = flow_mean2[:len(frame_list)]
+    # print(int(frame_list.get(cv2.CAP_PROP_FRAME_COUNT)))
+    print("Done.")
+    return flow_mean2
 
-    return flow_mean
-
+    # cap.release()
+    # cv2.destroyAllWindows()
 
 # # Video Path
 # data_path = os.path.join(Path(os.getcwd()).parent.absolute(), "Data")
