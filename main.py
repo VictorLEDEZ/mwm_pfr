@@ -109,6 +109,8 @@ def summary_param(dict_videos_param):
     return min_fps, min_resolution
 
 
+
+
 if __name__ == '__main__':
 
     if len(sys.argv) != 5:
@@ -131,20 +133,21 @@ if __name__ == '__main__':
     frames_list, videos_param = read_and_save_frames(videos_order)
 
     nb_shots = 16
-    shots = define_shots(frames_list, videos_param, nb_shots, range_min=1, show_viz=True)
+    shots = define_shots(frames_list, videos_param, nb_shots, shot_percentage, show_viz=True)
 
     summary_fps, summary_resolution = summary_param(videos_param)
 
     #######
     # ADD SHOTS ORDER
-    #dict_shots_order=
+    # dict_shots_order=
     ####
 
     min_shot_nb = len(videos_param)
 
-    summary_frames_index, time_before_drop = summary_frames_selection(summary_duration, summary_fps, shot_percentage,
-                                                                      dict_shots_order, min_shot_nb)
+    summary_frames_index, time_before_drop, summary_duration = summary_frames_selection(summary_duration, summary_fps,
+                                                                                        shot_percentage, dict_shots_order, min_shot_nb)
 
     print('time before drop:', time_before_drop)
+    print( "total duration summary",summary_duration)
 
     create_summary(frames_list, summary_frames_index, summary_filename, summary_resolution, summary_fps)

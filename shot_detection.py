@@ -58,7 +58,7 @@ def visualization(frames_list, shots):
     fig.show()
 
 
-def define_shots(frames_list, videos_param, nb_shots, range_min=1, show_viz=False):
+def define_shots(frames_list, videos_param, nb_shots, shot_percentage, show_viz=False):
     """
      Main function. Divide color difference histogram into a number of shots passed in inout parameter
 
@@ -90,8 +90,9 @@ def define_shots(frames_list, videos_param, nb_shots, range_min=1, show_viz=Fals
 
         valid = False  # flag: possible to add frame in shot list or not
 
-        for j in shots_index:  # check if a frame at range_min*fps range is not already a shot
-            if np.abs(j - val) > range_min * fps:
+        for j in shots_index:  # determine min shot length as (100/shot_percentage)*fps
+            if np.abs(j - val) > (100/shot_percentage) * fps:  # check if a frame at (100/shot_percentage)*fps range
+                # is not already a shot
                 valid = True
             else:
                 valid = False
