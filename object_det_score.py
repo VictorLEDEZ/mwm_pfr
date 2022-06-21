@@ -146,7 +146,7 @@ def frame_score(res, row, col):
 #     return results_object_det, normed_scores
 
 
-def object_det_score(frame_list, model_path="cfg/yolo.cfg", weights_path="bin/yolo.weights", thresold_pred=0.6, gpu=0):
+def object_det_score(frame_list, model_path="darkflow-mast/cfg/yolo.cfg", weights_path="darkflow-mast/bin/yolo.weights", thresold_pred=0.6, gpu=0):
     '''
     fonction qui renvoie le score pour toutes les frames d'une vidéo
     frame_list: liste de frames (list)
