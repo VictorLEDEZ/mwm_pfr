@@ -1,6 +1,7 @@
 import cv2
 import time
 import itertools
+from tqdm import tqdm
 
 
 def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dict_shots_order, min_shot_nb):
@@ -97,16 +98,15 @@ def create_summary(frames_list, summary_frames_index, summary_filename, summary_
     """
 
     frames_list = list(itertools.chain(*frames_list))  # flatten list
+    fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+    out = cv2.VideoWriter(summary_filename + '.mp4', fourcc, summary_fps, summary_resolution)
 
-    out = cv2.VideoWriter(summary_filename + '.mp4', cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'), summary_fps,
-                          summary_resolution)
-
-    for index, frame in enumerate(frames_list):  # loop over frame list & write frame if index in list selection
+    for index, frame in enumerate(tqdm(frames_list)):  # loop over frame list & write frame if index in list selection
         if index in summary_frames_index:
             frame_resized = cv2.resize(frame, summary_resolution, interpolation=cv2.INTER_AREA)  # reshape frames on
             # the same resolution
             out.write(frame_resized)
-            time.sleep(0.7)
+            time.sleep(0.4)
     # When everything done, release the video capture and video write objects
     # Cleanup and save video
     cv2.destroyAllWindows()
