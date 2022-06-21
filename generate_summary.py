@@ -77,8 +77,8 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
     nb_frames_before_top = summary_frames_index.index(best_frame)  # index of best frame in list
 
     time_before_drop = nb_frames_before_top / summary_fps  # time in seconds before the most important frame
-
-    return summary_frames_index, time_before_drop
+    summary_duration = len(summary_frames_index) / summary_fps  # summary time duration in seconds
+    return summary_frames_index, time_before_drop, summary_duration
 
 
 def create_summary(frames_list, summary_frames_index, summary_filename, summary_resolution, summary_fps):
