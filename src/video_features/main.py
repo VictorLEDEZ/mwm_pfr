@@ -8,10 +8,6 @@ import ffmpeg
 import cv2
 import platform
 import os
-<< << << < HEAD
-
-== == == =
->>>>>> > 3b6e5df(reordered and commented)
 
 
 def ordering_videos(dir_path):
