@@ -6,6 +6,16 @@ from sf_segmenter.segmenter import Segmenter
 
 
 def get_structure(audio_path, sampling_rate):
+    """Get the boundaries and the labels from an audio file
+
+    Args:
+        audio_path (string): path from the audio file
+        sampling_rate (int): sampling rate for analyzing the audio
+
+    Returns:
+        tuple: the boundaries and the labels
+    """
+
     y, sr = librosa.load(audio_path, sr=sampling_rate)
     pcp = audio_extract_pcp(y, sr)
     segmenter = Segmenter()
@@ -13,10 +23,3 @@ def get_structure(audio_path, sampling_rate):
     boundaries = [x / (boundaries[-1] /
                        (len(y) / sampling_rate)) for x in boundaries][1:]
     return boundaries, labels
-
-
-def get_shots_range(boundaries, audio_length):
-    mean_shots = len(boundaries) * (audio_length / boundaries[-1]) * 3
-    min_shots = math.floor(mean_shots)
-    max_shots = math.ceil(mean_shots)
-    return min_shots, max_shots
