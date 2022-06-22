@@ -2,6 +2,16 @@ import numpy as np
 
 
 def aggregate_structure_amplitude(boundaries, amplitudes):
+    """make the aggregation to get a score and the time array
+
+    Args:
+        boundaries (array): boundaries of the audio file
+        amplitudes (array): amplitudes of the audio file
+
+    Returns:
+        tuple: the aggregation as a function of the time
+    """
+
     amplitudes = np.around(amplitudes, decimals=0)
     boundaries = np.around(boundaries, decimals=1)
 

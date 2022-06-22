@@ -2,6 +2,20 @@ import numpy as np
 
 
 def get_audio_sequence(boundaries, labels, amplitudes, beat_times, duration, t_before_peak=15):
+    """get the segments and the peak of the audio file
+
+    Args:
+        boundaries (array): boundaries in seconds of the audio file
+        labels (array): labels of the segments
+        amplitudes (array): amplitudes of the audio file
+        beat_times (array): beats within the audio file
+        duration (float): duration of the picked sequence
+        t_before_peak (int, optional): time before the peak. Defaults to 15.
+
+    Returns:
+        tuple: the segments and the peak time
+    """
+
     boundaries = np.around(boundaries, decimals=1)
     amplitudes = np.around(amplitudes, decimals=1)
     beat_times = np.around(beat_times, decimals=1)
@@ -34,7 +48,7 @@ def get_audio_sequence(boundaries, labels, amplitudes, beat_times, duration, t_b
     t_start_sequence = t_start_max - t_before_peak
     t_end_sequence = t_start_sequence + duration
 
-    beat_peak = all_segments[max_amplitude_index]["beats"][0]
+    # beat_peak = all_segments[max_amplitude_index]["beats"][0] TO BE TESTED
 
     picked_segments = []
     for i, segment in enumerate(all_segments):
@@ -55,4 +69,4 @@ def get_audio_sequence(boundaries, labels, amplitudes, beat_times, duration, t_b
 
             picked_segments.append(picked_segment)
 
-    return all_segments, picked_segments, beat_peak
+    return all_segments, picked_segments, t_start_max
