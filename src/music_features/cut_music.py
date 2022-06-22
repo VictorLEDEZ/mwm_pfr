@@ -16,4 +16,4 @@ def cut_music(t1, t2, audio_path):
     newAudio = AudioSegment.from_wav(audio_path)
     newAudio = newAudio[t1:t2]
 
-    newAudio.export('src/music_features/cut.wav', format="wav")
+    newAudio.export('src/music_features/audio_sequence.wav', format="wav")
