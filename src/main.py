@@ -7,7 +7,7 @@ from music_features.main import music_features
 from video_features.generate_summary import (create_summary,
                                              summary_frames_selection)
 from video_features.main import (ordering_videos, read_and_save_frames,
-                                 summary_param)
+                                 summary_param, create_clip)
 from video_features.shot_detection import define_shots
 
 
@@ -24,9 +24,11 @@ if __name__ == '__main__':
         sys.exit(0)
 
     dir_path = sys.argv[1]
-    summary_filename = sys.argv[2]
+    clip_filename = sys.argv[2]
     summary_duration = int(sys.argv[3])
     shot_percentage = int(sys.argv[4])
+    summary_path = 'src/video_features/summary'
+    audio_path = 'src/music_features/audio_sequence.wav'
 
     videos_order = ordering_videos(dir_path)
 
@@ -55,4 +57,6 @@ if __name__ == '__main__':
         summary_frames_index)-(summary_fps*offset_end)]
 
     create_summary(frames_list, summary_frames_index,
-                   summary_filename, summary_resolution, summary_fps)
+                   summary_path, summary_resolution, summary_fps)
+
+    create_clip(summary_video_path=summary_path,audio_path=audio_path, clip_filename=clip_filename)

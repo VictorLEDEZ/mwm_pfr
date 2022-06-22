@@ -4,6 +4,7 @@ import platform
 import cv2
 import numpy as np
 from tqdm import tqdm
+import ffmpeg
 
 
 def ordering_videos(dir_path):
@@ -113,3 +114,22 @@ def summary_param(dict_videos_param):
                 min_resolution = (param[1], param[2])
     min_fps = np.min(fps_list)  # select minimal fps in fps list
     return min_fps, min_resolution
+
+def create_clip(summary_video_path,audio_path,clip_filename):
+
+    """
+    Function that creates a clip with video and audio
+
+    Input:
+            - summary_video_path  : string -> path to mp4 file
+            - audio_path          : string -> path to audio file
+            - clip_filename       : string -> filename of the output clip
+    Output:
+            Create mp4 file with audio and video
+    """
+
+    input_video = ffmpeg.input(summary_video_path+'.mp4')
+
+    input_audio = ffmpeg.input(audio_path)
+
+    ffmpeg.concat(input_video, input_audio, v=1, a=1).output(clip_filename+'.mp4').run()
