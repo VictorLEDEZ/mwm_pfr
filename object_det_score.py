@@ -1,11 +1,8 @@
 #installer la version tensorflow-gpu==1.15.0rc2 pour utiliser la version darkflow de YOLO avec un GPU
-import cv2
 import tensorflow as tf
 from darkflow.net.build import TFNet
 import matplotlib.pyplot as plt
 import sys
-import os
-import itertools
 
 
 def thema(res):
@@ -144,7 +141,7 @@ def frame_score(res, row, col):
 #     return results_object_det, normed_scores
 
 
-def object_det_score(frame_list, model_path="darkflow-mast/cfg/yolo.cfg", weights_path="darkflow-mast/bin/yolo.weights", thresold_pred=0.6, gpu=0):
+def object_det_score(frame_list, model_path="cfg/yolo.cfg", weights_path="bin/yolo.weights", thresold_pred=0.6, gpu=0):
     '''
     fonction qui renvoie le score pour toutes les frames d'une vidéo
     frame_list: liste de frames (list)
@@ -164,7 +161,7 @@ def object_det_score(frame_list, model_path="darkflow-mast/cfg/yolo.cfg", weight
     results_object_det = []
 
     tfnet = TFNet(options)
-    frame_list = list(itertools.chain(*frame_list)) 
+    # frame_list = list(itertools.chain(*frame_list)) 
 
     for frame in frame_list:
         row = frame.shape[0]
@@ -174,9 +171,9 @@ def object_det_score(frame_list, model_path="darkflow-mast/cfg/yolo.cfg", weight
         frame_scores.append(frame_score(new_results, row, col))
         results_object_det.append(new_results)
 
-    normed_scores = [float(i)/max(frame_scores) for i in frame_scores]
+    # normed_scores = [float(i)/max(frame_scores) for i in frame_scores]
 
-    return results_object_det, normed_scores
+    return results_object_det, frame_scores
 
 
 def main():
