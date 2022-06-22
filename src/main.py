@@ -1,13 +1,12 @@
 import sys
 
-import score
-
 from music_features.config.main import AUDIO_PATH, SAMPLING_RATE
 from music_features.main import music_features
 from video_features.generate_summary import (create_summary,
                                              summary_frames_selection)
 from video_features.main import (ordering_videos, read_and_save_frames,
                                  summary_param, create_clip)
+from video_features.score import score
 from video_features.shot_detection import define_shots
 
 
