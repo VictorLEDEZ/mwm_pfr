@@ -15,7 +15,7 @@ if __name__ == '__main__':
 
     if len(sys.argv) != 5:
         print("""
-        Three arguments are required:
+        Four arguments are required:
             - The first argument should be the path to the videos directory
             - The second argument is the name of the summary output file
             - The third argument is an integer for the summary duration time in seconds
@@ -23,14 +23,15 @@ if __name__ == '__main__':
             """)
         sys.exit(0)
 
-    dir_path = sys.argv[1]
+    videos_path = sys.argv[1]
     clip_filename = sys.argv[2]
     summary_duration = int(sys.argv[3])
     shot_percentage = int(sys.argv[4])
-    summary_path = 'src/video_features/summary'
-    audio_path = 'src/music_features/audio_sequence.wav'
 
-    videos_order = ordering_videos(dir_path)
+    summary_path = 'src/video_features/summary'
+    audio_sequence_path = 'src/music_features/audio_sequence.wav'
+
+    videos_order = ordering_videos(videos_path)
 
     frames_list, videos_param = read_and_save_frames(videos_order)
 
@@ -59,4 +60,5 @@ if __name__ == '__main__':
     create_summary(frames_list, summary_frames_index,
                    summary_path, summary_resolution, summary_fps)
 
-    create_clip(summary_video_path=summary_path,audio_path=audio_path, clip_filename=clip_filename)
+    create_clip(summary_video_path=summary_path,
+                audio_path=audio_sequence_path, clip_filename=clip_filename)
