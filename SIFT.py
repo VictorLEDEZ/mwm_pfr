@@ -62,24 +62,28 @@ def Sift(frame_list, frame_shift=1, display = False, save_video = False, samplin
             keypoints_1, descriptors_1 = sift.detectAndCompute(current_frame,None)
             keypoints_2, descriptors_2 = sift.detectAndCompute(next_frame,None)
 
-            matches = bf.match(descriptors_1,descriptors_2)
-            matches = sorted(matches, key = lambda x:x.distance)
+            if len(keypoints_1) > 0 and len(keypoints_2) > 0:
+                matches = bf.match(descriptors_1,descriptors_2)
+                matches = sorted(matches, key = lambda x:x.distance)
             
-            # print(len(matches))
-            match_step = 10
+                # print(len(matches))
+                match_step = 10
 
-            if len(matches) > match_step:
-                matches = matches[::len(matches)//match_step]
+                if len(matches) > match_step:
+                    matches = matches[::len(matches)//match_step]
 
-            matches_dist = [match.distance for match in matches]
-            sift_mean.append(np.mean(matches_dist))
-            # print(sift_mean)
+                matches_dist = [match.distance for match in matches]
+                sift_mean.append(np.mean(matches_dist))
+                # print(sift_mean)
 
-            end = time.time()
-            totalTime = end - start
-            fps = 1 // totalTime
-            # print("FPS: ", fps)
-                        
+                end = time.time()
+                totalTime = end - start
+                fps = 1 // totalTime
+                # print("FPS: ", fps)
+            
+            else :
+                sift_mean.append(sift_mean[-1])
+                            
             if display == True :
                 img3 = cv2.drawMatches(current_frame, keypoints_1, next_frame, keypoints_2, matches, next_frame, flags=2)      # Adapter taille de matches
                 img_lst.append(img3)

@@ -95,7 +95,7 @@ def score(frame_list, shots, sampling_rate=10):
         agreg = [flow_coef*flow[i] + sift_coef*sift[i] + obj_coef*obj_score[i] for i in range(len(flow))]
         return agreg
 
-    agreg = agregation(flow=flow_norm, sift=sift_norm, obj=obj_score_norm, flow_coef=1, sift_coef=1, obj_coef=1)
+    agreg = agregation(flow=flow_norm, sift=sift_norm, obj=obj_score_norm, flow_coef=0.5, sift_coef=0.5, obj_coef=1)
 
     agreg_sift = [inner for outer in sift_norm for inner in outer]
     agreg_flow = [inner for outer in flow_norm for inner in outer]
