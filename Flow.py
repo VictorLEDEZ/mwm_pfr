@@ -45,8 +45,8 @@ def Flow(frame_list, frame_shift=1, display = False, save_video = False, samplin
 
         return bgr
 
-    def normalize(flow_mean):
-        return (flow_mean - np.min(flow_mean)) / (np.max(flow_mean) - np.min(flow_mean))
+    # def normalize(flow_mean):
+    #     return (flow_mean - np.min(flow_mean)) / (np.max(flow_mean) - np.min(flow_mean))
 
     
     # cap = cv2.VideoCapture(video_path)
@@ -60,12 +60,14 @@ def Flow(frame_list, frame_shift=1, display = False, save_video = False, samplin
 
     # while suc:
     for frame_number in range(len(frame_list)):
-        if frame_number%sampling_rate==0:
+    #     if frame_number%sampling_rate==0:
+        if frame_number != len(frame_list)-1:
             current_frame = np.array(frame_list[frame_number])
             next_frame = np.array(frame_list[frame_number+frame_shift])
             # prevgray = cv2.cvtColor(np.array(video[frame_number]), cv2.COLOR_BGR2GRAY)
-            if next_frame is None :
-                break
+
+            # if next_frame is None :
+            #     break
 
             # print(frame_number)
             # img = frame_list.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
@@ -106,6 +108,8 @@ def Flow(frame_list, frame_shift=1, display = False, save_video = False, samplin
             #     break
 
         # frame_number += 1
+    
+    flow_mean.append(flow_mean[-1])
 
     if display == True :
         frames = [i for i in range(0, len(flow_mean))]
@@ -119,21 +123,18 @@ def Flow(frame_list, frame_shift=1, display = False, save_video = False, samplin
         imageio.mimsave(os.path.join(data_path, "flow.gif"), img_lst)
         imageio.mimsave(os.path.join(data_path, "flow_hsv.gif"), img_lst2)
 
-    for i in flow_mean:
-        for j in range(sampling_rate):
-            flow_mean2 = np.append(flow_mean2, i)
     # flow_mean = normalize(np.array(flow_mean))
-    flow_mean2 = flow_mean2[:len(frame_list)]
+    # flow_mean2 = flow_mean2[:len(frame_list)]
     # print(int(frame_list.get(cv2.CAP_PROP_FRAME_COUNT)))
     print("Done.")
-    return flow_mean2
+    return flow_mean
 
     # cap.release()
     # cv2.destroyAllWindows()
 
-# # Video Path
-# data_path = os.path.join(Path(os.getcwd()).parent.absolute(), "Data")
-# video_path = os.path.join(data_path, "cut.mp4")
+    # # Video Path
+    # data_path = os.path.join(Path(os.getcwd()).parent.absolute(), "Data")
+    # video_path = os.path.join(data_path, "cut.mp4")
 
-# # Run
-# flow = Flow(video_path, display = True)
+    # # Run
+    # flow = Flow(video_path, display = True)

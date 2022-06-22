@@ -39,15 +39,20 @@ def Sift(frame_list, frame_shift=1, display = False, save_video = False, samplin
     frame_number = 0
     frame_list2 = frame_list
 
+    # for frame_number in range(len(frame_list)):
+        # if frame_number%sampling_rate==0:
+    # print(len(frame_list))
     for frame_number in range(len(frame_list)):
-        if frame_number%sampling_rate==0:
+        if frame_number != len(frame_list)-1:
+            # print(frame_number)
+
             current_frame = np.array(frame_list[frame_number])
             next_frame = np.array(frame_list[frame_number+frame_shift])
             # success, current_frame = frame_list.read()
             # success2, next_frame = frame_list2.read()
 
-            if next_frame is None :
-                break
+            # if next_frame is None :
+            #     break
 
             start = time.time()
 
@@ -59,7 +64,12 @@ def Sift(frame_list, frame_shift=1, display = False, save_video = False, samplin
 
             matches = bf.match(descriptors_1,descriptors_2)
             matches = sorted(matches, key = lambda x:x.distance)
-            matches = matches[200:250]
+            
+            # print(len(matches))
+            match_step = 10
+
+            if len(matches) > match_step:
+                matches = matches[::len(matches)//match_step]
 
             matches_dist = [match.distance for match in matches]
             sift_mean.append(np.mean(matches_dist))
@@ -69,9 +79,9 @@ def Sift(frame_list, frame_shift=1, display = False, save_video = False, samplin
             totalTime = end - start
             fps = 1 // totalTime
             # print("FPS: ", fps)
-            
+                        
             if display == True :
-                img3 = cv2.drawMatches(current_frame, keypoints_1, next_frame, keypoints_2, matches[200:250], next_frame, flags=2)      # Adapter taille de matches
+                img3 = cv2.drawMatches(current_frame, keypoints_1, next_frame, keypoints_2, matches, next_frame, flags=2)      # Adapter taille de matches
                 img_lst.append(img3)
                 
                 cv2.putText(img3, f'Frame number: {int(frame_number)}', (30,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 1)
@@ -81,13 +91,12 @@ def Sift(frame_list, frame_shift=1, display = False, save_video = False, samplin
             if save_video == True :
                 # Write video
                 out.write(img3)
+                    # if cv2.waitKey(5) & 0xFF == ord('q'):
+                    #     break
 
-            # if cv2.waitKey(5) & 0xFF == ord('q'):
-            #     break
+    # frame_number += 1
 
-    frame_number += 1
-
-
+    sift_mean.append(sift_mean[-1])     # Add frame at the end
 
     if save_video == True :
         out.release()
@@ -102,21 +111,21 @@ def Sift(frame_list, frame_shift=1, display = False, save_video = False, samplin
         fig = px.bar(df, x='Frame number', y='SIFT mean')
         fig.show()
 
-    for i in sift_mean:
-        for j in range(sampling_rate):
-            sift_mean2 = np.append(sift_mean2, i)
-    # sift_mean = normalize(np.array(sift_mean))
-    sift_mean2 = sift_mean2[:len(frame_list)]
+    # for i in sift_mean:
+    #     for j in range(sampling_rate):
+    #         sift_mean2 = np.append(sift_mean2, i)
+    # # sift_mean = normalize(np.array(sift_mean))
+    # sift_mean2 = sift_mean2[:len(frame_list)]
     # print(int(video.get(cv2.CAP_PROP_FRAME_COUNT)))
     print("Done.")
-    return sift_mean2
+    return sift_mean
 
-    # cv2.destroyAllWindows()
-    # cap.release()
+            # cv2.destroyAllWindows()
+            # cap.release()
 
-# # Video Path
-# data_path = os.path.join(Path(os.getcwd()).parent.absolute(), "Data")
-# video_path = os.path.join(data_path, "cut.mp4")
+        # # Video Path
+        # data_path = os.path.join(Path(os.getcwd()).parent.absolute(), "Data")
+        # video_path = os.path.join(data_path, "cut.mp4")
 
-# # Run
-# Sift(video_path, display = True, save_video = False)
+        # # Run
+        # Sift(video_path, display = True, save_video = False)
