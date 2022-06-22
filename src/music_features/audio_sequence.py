@@ -48,25 +48,34 @@ def get_audio_sequence(boundaries, labels, amplitudes, beat_times, duration, t_b
     t_start_sequence = t_start_max - t_before_peak
     t_end_sequence = t_start_sequence + duration
 
-    # beat_peak = all_segments[max_amplitude_index]["beats"][0] TO BE TESTED
 
-    picked_segments = []
-    for i, segment in enumerate(all_segments):
+<< << << < HEAD
+# beat_peak = all_segments[max_amplitude_index]["beats"][0] TO BE TESTED
+== == == =
+beat_peak = all_segments[max_amplitude_index]["beats"][0]
+>>>>>> > efdb65d(reorganise structure of audio part)
 
-        if ((t_start_sequence <= segment['t_start'] <= t_end_sequence) | (t_start_sequence <= segment['t_end'] <= t_end_sequence)):
+picked_segments = []
+for i, segment in enumerate(all_segments):
 
-            t_start = t_start_sequence if (
-                t_start_sequence >= segment['t_start']) else segment['t_start']
-            t_end = t_end_sequence if (
-                t_end_sequence <= segment['t_end']) else segment['t_end']
+    if ((t_start_sequence <= segment['t_start'] <= t_end_sequence) | (t_start_sequence <= segment['t_end'] <= t_end_sequence)):
 
-            picked_segment = {
-                "mean_amplitude": amplitudes[i],
-                "t_start": t_start,
-                "t_end": t_end,
-                "beats": list(filter(lambda beat_time: (beat_time >= t_start) & (beat_time < t_end), beat_times)),
-            }
+        t_start = t_start_sequence if (
+            t_start_sequence >= segment['t_start']) else segment['t_start']
+        t_end = t_end_sequence if (
+            t_end_sequence <= segment['t_end']) else segment['t_end']
 
-            picked_segments.append(picked_segment)
+        picked_segment = {
+            "mean_amplitude": amplitudes[i],
+            "t_start": t_start,
+            "t_end": t_end,
+            "beats": list(filter(lambda beat_time: (beat_time >= t_start) & (beat_time < t_end), beat_times)),
+        }
 
-    return all_segments, picked_segments, t_start_max
+        picked_segments.append(picked_segment)
+
+<< << << < HEAD
+return all_segments, picked_segments, t_start_max
+== == == =
+return all_segments, picked_segments, beat_peak
+>>>>>> > efdb65d(reorganise structure of audio part)
