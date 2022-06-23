@@ -1,8 +1,12 @@
+import warnings
+warnings.filterwarnings("ignore")
+
 from video_features.SIFT import Sift
 from video_features.Flow import Flow
 from video_features.object_det_score import object_det_score
 from video_features.shot_detection import define_shots
 from video_features.shots_order import shots_order
+from tqdm import tqdm 
 
 import os
 from pathlib import Path
@@ -38,7 +42,7 @@ def score(frame_list, shots, sampling_rate=10):
     active_sift = False
 
     if active_sift == True:
-        for video in frame_list:
+        for video in tqdm(frame_list):
             # for frame_number in range(len(video)):
             # if frame_number%sampling_rate==0:
             sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False,
@@ -96,7 +100,7 @@ def score(frame_list, shots, sampling_rate=10):
         # print(obj_score.shape)
 
     elif active_sift == False:
-        for video in frame_list:
+        for video in tqdm(frame_list):
             # for frame_number in range(len(video)):
             # if frame_number%sampling_rate==0:
             flow_video = Flow(video[::sampling_rate], frame_shift=1,
