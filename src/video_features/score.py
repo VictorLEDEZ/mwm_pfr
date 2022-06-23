@@ -46,9 +46,9 @@ def score(frame_list, shots, sampling_rate=10):
             # for frame_number in range(len(video)):
             # if frame_number%sampling_rate==0:
             sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False,
-                            save_video=False, sampling_rate=sampling_rate)  # PATENTED ?
+                            save_video=False)  # PATENTED ?
             flow_video = Flow(video[::sampling_rate], frame_shift=1,
-                            display=False, save_video=False, sampling_rate=sampling_rate)
+                            display=False)
             obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
 
             # sift_video.append(Sift(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate)) # PATENTED ?
@@ -104,7 +104,7 @@ def score(frame_list, shots, sampling_rate=10):
             # for frame_number in range(len(video)):
             # if frame_number%sampling_rate==0:
             flow_video = Flow(video[::sampling_rate], frame_shift=1,
-                            display=False, save_video=False, sampling_rate=sampling_rate)
+                            display=False)
             obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
 
             # sift_video.append(Sift(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate)) # PATENTED ?
