@@ -12,15 +12,15 @@ from video_features.shot_detection import define_shots
 
 if __name__ == '__main__':
 
-    if len(sys.argv) != 5:
-        print("""
-        Four arguments are required:
-            - The first argument should be the path to the videos directory
-            - The second argument is the name of the clip
-            - The third argument is an integer for the summary duration time in seconds
-            - The fourth argument is an integer for the percentage of one shot summary
-            """)
-        sys.exit(0)
+    # if len(sys.argv) != 5:
+    #     print("""
+    #     Four arguments are required:
+    #         - The first argument should be the path to the videos directory
+    #         - The second argument is the name of the clip
+    #         - The third argument is an integer for the summary duration time in seconds
+    #         - The fourth argument is an integer for the percentage of one shot summary
+    #         """)
+    #     sys.exit(0)
 
     videos_path = sys.argv[1]
     clip_filename = sys.argv[2]
@@ -28,15 +28,18 @@ if __name__ == '__main__':
     shot_percentage = int(sys.argv[4])
 
     summary_path = pathlib.Path(__file__).parent.joinpath(
-        'video_features/summary')
-    audio_sequence_path = pathlib.Path(__file__).parent.parent.joinpath(
+        'video_features/summary.mp4')
+    audio_sequence_path = pathlib.Path(__file__).parent.joinpath(
         'music_features/audio_sequence.wav')
+
+    print(summary_path)
+    print(audio_sequence_path)
 
     videos_order = ordering_videos(videos_path)
 
     frames_list, videos_param = read_and_save_frames(videos_order)
 
-    nb_shots = 16
+    nb_shots = 30
     shots = define_shots(frames_list, videos_param,
                          nb_shots, shot_percentage, show_viz=True)
 
@@ -52,11 +55,11 @@ if __name__ == '__main__':
     print('time before drop:', time_before_drop)
     print("total duration summary", summary_duration)
 
+
     all_segments, picked_segments, beat_start, t_peak, beat_end, offset_start, offset_end = music_features(
         AUDIO_PATH, summary_duration, SAMPLING_RATE, time_before_drop, printing=False, plotting=False)
 
-    summary_frames_index = summary_frames_index[summary_fps*offset_start:len(
-        summary_frames_index)-(summary_fps*offset_end)]
+    summary_frames_index = summary_frames_index[int(summary_fps*offset_start) : len(summary_frames_index)-int((summary_fps*offset_end))]
 
     create_summary(frames_list, summary_frames_index,
                    summary_path, summary_resolution, summary_fps)

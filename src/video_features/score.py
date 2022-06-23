@@ -1,8 +1,8 @@
-from SIFT import Sift
-from Flow import Flow
+from video_features.SIFT import Sift
+from video_features.Flow import Flow
 from video_features.object_det_score import object_det_score
-from shot_detection import define_shots
-from shots_order import shots_order
+from video_features.shot_detection import define_shots
+from video_features.shots_order import shots_order
 
 import os
 from pathlib import Path
@@ -34,66 +34,111 @@ def score(frame_list, shots, sampling_rate=10):
     dir = os.getcwd()
     os.chdir("./darkflow-mast")
 
-    for video in frame_list:
-        # for frame_number in range(len(video)):
-        # if frame_number%sampling_rate==0:
-        sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False,
-                          save_video=False, sampling_rate=sampling_rate)  # PATENTED ?
-        flow_video = Flow(video[::sampling_rate], frame_shift=1,
-                          display=False, save_video=False, sampling_rate=sampling_rate)
-        obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
 
-        # sift_video.append(Sift(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate)) # PATENTED ?
-        # flow_video.append(Flow(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate))
-        # obj_score_video.append(object_det_score(video[::sampling_rate], gpu=1)[1])
-        # frame_number += 1
+    active_sift = False
 
-    # obj_score_video = [np.zeros(flow[i].shape) for i in range(len(flow))]     # !!!!!!!! #
-        sift_tmp = []
-        flow_tmp = []
-        obj_score_tmp = []
+    if active_sift == True:
+        for video in frame_list:
+            # for frame_number in range(len(video)):
+            # if frame_number%sampling_rate==0:
+            sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False,
+                            save_video=False, sampling_rate=sampling_rate)  # PATENTED ?
+            flow_video = Flow(video[::sampling_rate], frame_shift=1,
+                            display=False, save_video=False, sampling_rate=sampling_rate)
+            obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
 
-        if max(sift_video) > max_sift:
-            max_sift = max(sift_video)
-        if max(flow_video) > max_flow:
-            max_flow = max(flow_video)
-        if max(obj_score_video) > max_object_score:
-            max_object_score = max(obj_score_video)
+            # sift_video.append(Sift(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate)) # PATENTED ?
+            # flow_video.append(Flow(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate))
+            # obj_score_video.append(object_det_score(video[::sampling_rate], gpu=1)[1])
+            # frame_number += 1
 
-        for i, j, k in zip(sift_video, flow_video, obj_score_video):
-            for s in range(sampling_rate):
-                sift_tmp.append(i)
-                flow_tmp.append(j)
-                obj_score_tmp.append(k)
+            # sift_norm = [np.zeros(flow[i].shape) for i in range(len(flow))]     # !!!!!!!! #
+            sift_tmp = []
+            flow_tmp = []
+            obj_score_tmp = []
 
-        sift.append(sift_tmp)
-        flow.append(flow_tmp)
-        obj_score.append(obj_score_tmp)
+            if max(sift_video) > max_sift:
+                max_sift = max(sift_video)
+            if max(flow_video) > max_flow:
+                max_flow = max(flow_video)
+            if max(obj_score_video) > max_object_score:
+                max_object_score = max(obj_score_video)
 
-    # print(np.shape(sift))
-    # print(np.shape(sift[0]))
+            for i, j, k in zip(sift_video, flow_video, obj_score_video):
+                for s in range(sampling_rate):
+                    sift_tmp.append(i)
+                    flow_tmp.append(j)
+                    obj_score_tmp.append(k)
 
-    # Normalization
-    for video in range(len(sift)):
-        sift_norm.append(np.array(sift[video]) / max_sift)
-        flow_norm.append(np.array(flow[video]) / max_flow)
-        obj_score_norm.append(np.array(obj_score[video]) / max_object_score)
+            sift.append(sift_tmp)
+            flow.append(flow_tmp)
+            obj_score.append(obj_score_tmp)
 
-        # print("FLOW", flow)
-        # print("\n")
+        # print(np.shape(sift))
+        # print(np.shape(sift[0]))
 
-        # sift2 = [i for i in sift_video for s in range(sampling_rate)]
-        # flow2 = [i for i in flow_video for s in range(sampling_rate)]
-        # obj_score2 = [i for i in obj_score for s in range(sampling_rate)]
-        # print("Flow2", flow2)
+        # Normalization
+        for video in range(len(sift)):
+            sift_norm.append(np.array(sift[video]) / max_sift)
+            flow_norm.append(np.array(flow[video]) / max_flow)
+            obj_score_norm.append(np.array(obj_score[video]) / max_object_score)
 
-    # print(flow.shape)
-    # print(sift.shape)
-    # print(obj_score.shape)
+            # print("FLOW", flow)
+            # print("\n")
+
+            # sift2 = [i for i in sift_video for s in range(sampling_rate)]
+            # flow2 = [i for i in flow_video for s in range(sampling_rate)]
+            # obj_score2 = [i for i in obj_score for s in range(sampling_rate)]
+            # print("Flow2", flow2)
+
+        # print(flow.shape)
+        # print(sift.shape)
+        # print(obj_score.shape)
+
+    elif active_sift == False:
+        for video in frame_list:
+            # for frame_number in range(len(video)):
+            # if frame_number%sampling_rate==0:
+            flow_video = Flow(video[::sampling_rate], frame_shift=1,
+                            display=False, save_video=False, sampling_rate=sampling_rate)
+            obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
+
+            # sift_video.append(Sift(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate)) # PATENTED ?
+            # flow_video.append(Flow(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate))
+            # obj_score_video.append(object_det_score(video[::sampling_rate], gpu=1)[1])
+            # frame_number += 1
+
+            sift_tmp = []
+            flow_tmp = []
+            obj_score_tmp = []
+
+            if max(flow_video) > max_flow:
+                max_flow = max(flow_video)
+            if max(obj_score_video) > max_object_score:
+                max_object_score = max(obj_score_video)
+
+            for j, k in zip(flow_video, obj_score_video):
+                for s in range(sampling_rate):
+                    flow_tmp.append(j)
+                    obj_score_tmp.append(k)
+
+            flow.append(flow_tmp)
+            obj_score.append(obj_score_tmp)
+
+        # print(np.shape(sift))
+        # print(np.shape(sift[0]))
+
+        # Normalization
+        for video in range(len(flow)):
+            flow_norm.append(np.array(flow[video]) / max_flow)
+            obj_score_norm.append(np.array(obj_score[video]) / max_object_score)
+
+        sift_norm = [np.zeros(flow_norm[i].shape) for i in range(len(flow))]     # !!!!!!!! #
+
 
     os.chdir(dir)
 
-    def agregation(flow=flow_norm, sift=sift_norm, obj=obj_score_norm, flow_coef=1, sift_coef=1, obj_coef=1):
+    def agregation(flow=flow_norm, sift=sift_norm, obj=obj_score_norm, flow_coef=0.5, sift_coef=0.5, obj_coef=1):
         agreg = [flow_coef*flow[i] + sift_coef*sift[i] +
                  obj_coef*obj_score[i] for i in range(len(flow))]
         return agreg

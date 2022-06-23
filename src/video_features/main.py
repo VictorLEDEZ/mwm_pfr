@@ -7,7 +7,6 @@ import ffmpeg
 import numpy as np
 from tqdm import tqdm
 
-import video_features.score
 from video_features.generate_summary import (create_summary,
                                              summary_frames_selection)
 from video_features.shot_detection import define_shots
@@ -133,10 +132,22 @@ def create_clip(summary_video_path, audio_path, clip_filename):
     Output:
             Create mp4 file with audio and video
     """
+    print(os.getcwd())
+    input_video = ffmpeg.input(str(summary_video_path))
 
-    input_video = ffmpeg.input(summary_video_path + '.mp4')
+    input_audio = ffmpeg.input(str(audio_path))
 
-    input_audio = ffmpeg.input(audio_path)
+    print("\n")
+    print(input_audio)
+    print(str(audio_path))
+    print(type(str(audio_path)))
+    print("\n")
+    print(input_video)
+    print(summary_video_path)
+    print(type(summary_video_path))
+    print("\n")
+    print(clip_filename)
+    print("\n")
 
     ffmpeg.concat(input_video, input_audio, v=1, a=1).output(
-        clip_filename+'.mp4').run()
+        clip_filename+'.mp4').run(cmd=r'C:\Users\RamziG5\anaconda3\envs\pfr\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win64-v4.2.2.exe')
