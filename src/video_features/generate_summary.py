@@ -36,7 +36,8 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
             first_frame_index = value[2][0]  # first frame index of the current shot
             last_frame_index = value[2][1]  # last frame index of the current shot
             if best_shot:  # save best frame index of top1 shot
-                best_frame = value[1]
+                best_frame = first_frame_index
+                best_shot = False
             shot_frames_nb = last_frame_index - first_frame_index  # number of frames in shots
             summary_shot_frames_nb = int(
                 shot_frames_nb * shot_percentage / 100)  # number of frames to select for the summary
@@ -99,7 +100,7 @@ def create_summary(frames_list, summary_frames_index, summary_filename, summary_
 
     frames_list = list(itertools.chain(*frames_list))  # flatten list
     fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
-    out = cv2.VideoWriter(summary_filename + '.mp4', fourcc, summary_fps, summary_resolution)
+    out = cv2.VideoWriter(str(summary_filename) + '.mp4', fourcc, summary_fps, summary_resolution)
 
     for index, frame in enumerate(tqdm(frames_list)):  # loop over frame list & write frame if index in list selection
         if index in summary_frames_index:
