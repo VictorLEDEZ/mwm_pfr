@@ -43,8 +43,7 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
         for key, value in dict_shots_order.items():
             first_frame_index = value[2][0]  # first frame index of the current shot
             last_frame_index = value[2][1]  # last frame index of the current shot
-            if key == best_shot:  # save best frame index of top1 shot
-                best_frame = first_frame_index
+
             shot_frames_nb = last_frame_index - first_frame_index  # number of frames in shots
             summary_shot_frames_nb = int(
                 shot_frames_nb * shot_percentage / 100)  # number of frames to select for the summary
@@ -69,6 +68,9 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
                 offset = slice_sup - last_frame_index
                 slice_sup = last_frame_index
                 slice_inf -= offset
+
+            if key == best_shot:  # select first frame index of best shot summary
+                best_frame = slice_inf
 
             shot_selection = list(range(slice_inf, slice_sup))  # generate a list of index between the two bounds
             summary_frames_nb += len(shot_selection)  # update number of selected frames
