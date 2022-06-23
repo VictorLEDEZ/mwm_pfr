@@ -16,3 +16,10 @@ def get_beats(audio_path):
     _, beat_times = librosa.beat.beat_track(x, sr=sr, units='time')
 
     return beat_times
+
+# import madmom
+
+# proc = madmom.features.downbeats.RNNDownBeatProcessor()
+# out = proc('src/music_features/audio_samples/PharrellWilliams_Happy.wav')
+
+# print(out)

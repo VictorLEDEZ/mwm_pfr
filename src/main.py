@@ -1,14 +1,14 @@
+import pathlib
 import sys
 
 from music_features.config.main import AUDIO_PATH, SAMPLING_RATE
 from music_features.main import music_features
 from video_features.generate_summary import (create_summary,
                                              summary_frames_selection)
-from video_features.main import (ordering_videos, read_and_save_frames,
-                                 summary_param, create_clip)
+from video_features.main import (create_clip, ordering_videos,
+                                 read_and_save_frames, summary_param)
 from video_features.score import score
 from video_features.shot_detection import define_shots
-
 
 if __name__ == '__main__':
 
@@ -27,11 +27,15 @@ if __name__ == '__main__':
     summary_duration = int(sys.argv[3])
     shot_percentage = int(sys.argv[4])
 
-    summary_path = 'src/video_features/summary'
-    audio_sequence_path = 'src/music_features/audio_sequence.wav'
+    summary_path = pathlib.Path(__file__).parent.joinpath(
+        'video_features/summary')
+    audio_sequence_path = pathlib.Path(__file__).parent.parent.joinpath(
+        'music_features/audio_sequence.wav')
 
-    summary_path = 'src/video_features/summary'
-    audio_sequence_path = 'src/music_features/audio_sequence.wav'
+    summary_path = pathlib.Path(__file__).parent.parent.joinpath(
+        'video_features/summary')
+    audio_sequence_path = pathlib.Path(__file__).parent.parent.joinpath(
+        'music_features/audio_sequence.wav')
 
     videos_order = ordering_videos(videos_path)
 
