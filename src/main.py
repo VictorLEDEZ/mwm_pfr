@@ -35,14 +35,14 @@ if __name__ == '__main__':
     audio_sequence_path = pathlib.Path(__file__).parent.joinpath(
         'music_features/audio_sequence.wav')
 
-    print(summary_path)
-    print(audio_sequence_path)
+    # print(summary_path)
+    # print(audio_sequence_path)
 
     videos_order = ordering_videos(videos_path)
 
     frames_list, videos_param = read_and_save_frames(videos_order)
 
-    nb_shots = 30
+    nb_shots = 10
     shots = define_shots(frames_list, videos_param,
                          nb_shots, shot_percentage, show_viz=True)
 
