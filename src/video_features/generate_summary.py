@@ -30,14 +30,21 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
         summary_frames_nb = 0  # number of frames selected counter
         summary_frames_index = []  # array of frame index selected
 
-        best_shot = True
+        # take key of best shot (ordered by shot mean value)
+        dict_mean_order=list(dict(sorted(dict_shots_order.items(), key=lambda item: item[1],reverse=True)).keys())
+
+        # define best sho number
+        if dict_mean_order[0] == list(dict_shots_order.keys())[0]:  # check if first histogram has the best shot mean
+            best_shot = dict_mean_order[1]  # take the second histogram as best shot in order to have time before
+            # music drop
+        else:
+            best_shot = dict_mean_order[0]
 
         for key, value in dict_shots_order.items():
             first_frame_index = value[2][0]  # first frame index of the current shot
             last_frame_index = value[2][1]  # last frame index of the current shot
-            if best_shot:  # save best frame index of top1 shot
+            if key == best_shot:  # save best frame index of top1 shot
                 best_frame = first_frame_index
-                best_shot = False
             shot_frames_nb = last_frame_index - first_frame_index  # number of frames in shots
             summary_shot_frames_nb = int(
                 shot_frames_nb * shot_percentage / 100)  # number of frames to select for the summary
