@@ -1,13 +1,16 @@
-import score from score
-import sys
-from generate_summary import create_summary, summary_frames_selection
-from shot_detection import define_shots
-from tqdm import tqdm
-import numpy as np
-import ffmpeg
-import cv2
-import platform
 import os
+import platform
+import sys
+
+import cv2
+import ffmpeg
+import numpy as np
+from tqdm import tqdm
+
+import video_features.score
+from video_features.generate_summary import (create_summary,
+                                             summary_frames_selection)
+from video_features.shot_detection import define_shots
 
 
 def ordering_videos(dir_path):

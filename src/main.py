@@ -16,7 +16,7 @@ if __name__ == '__main__':
         print("""
         Four arguments are required:
             - The first argument should be the path to the videos directory
-            - The second argument is the name of the summary output file
+            - The second argument is the name of the clip
             - The third argument is an integer for the summary duration time in seconds
             - The fourth argument is an integer for the percentage of one shot summary
             """)
@@ -28,11 +28,6 @@ if __name__ == '__main__':
     shot_percentage = int(sys.argv[4])
 
     summary_path = pathlib.Path(__file__).parent.joinpath(
-        'video_features/summary')
-    audio_sequence_path = pathlib.Path(__file__).parent.parent.joinpath(
-        'music_features/audio_sequence.wav')
-
-    summary_path = pathlib.Path(__file__).parent.parent.joinpath(
         'video_features/summary')
     audio_sequence_path = pathlib.Path(__file__).parent.parent.joinpath(
         'music_features/audio_sequence.wav')
