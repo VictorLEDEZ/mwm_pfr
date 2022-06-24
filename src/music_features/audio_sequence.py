@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def get_audio_sequence(boundaries, labels, amplitudes, beat_times, duration, t_before_peak=15):
+def get_audio_sequence(boundaries, labels, amplitudes, beat_times, downbeat_times, duration, t_before_peak=15):
     """get the segments and the peak of the audio file
 
     Args:
@@ -19,6 +19,7 @@ def get_audio_sequence(boundaries, labels, amplitudes, beat_times, duration, t_b
     boundaries = np.around(boundaries, decimals=1)
     amplitudes = np.around(amplitudes, decimals=1)
     beat_times = np.around(beat_times, decimals=1)
+    downbeat_times = np.around(downbeat_times, decimals=1)
     duration = np.around(duration, decimals=1)
     t_before_peak = np.around(t_before_peak, decimals=1)
 
@@ -32,6 +33,7 @@ def get_audio_sequence(boundaries, labels, amplitudes, beat_times, duration, t_b
             "t_start": t_start,
             "t_end": boundary,
             "beats": list(filter(lambda beat_time: (beat_time >= t_start) & (beat_time < boundary), beat_times)),
+            "downbeats": list(filter(lambda downbeat_time: (downbeat_time >= t_start) & (downbeat_time < boundary), downbeat_times)),
         }
 
         all_segments.append(segment)
@@ -49,6 +51,7 @@ def get_audio_sequence(boundaries, labels, amplitudes, beat_times, duration, t_b
     t_end_sequence = t_start_sequence + duration
 
     # beat_peak = all_segments[max_amplitude_index]["beats"][0] TO BE TESTED
+    # downbeat_peak = all_segments[max_amplitude_index]["downbeats"][0] TO BE TESTED
 
     picked_segments = []
     for i, segment in enumerate(all_segments):
@@ -65,6 +68,7 @@ def get_audio_sequence(boundaries, labels, amplitudes, beat_times, duration, t_b
                 "t_start": t_start,
                 "t_end": t_end,
                 "beats": list(filter(lambda beat_time: (beat_time >= t_start) & (beat_time < t_end), beat_times)),
+                "downbeats": list(filter(lambda downbeat_time: (downbeat_time >= t_start) & (downbeat_time < t_end), downbeat_times)),
             }
 
             picked_segments.append(picked_segment)
