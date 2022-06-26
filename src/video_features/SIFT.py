@@ -40,10 +40,12 @@ def Sift(frame_list, frame_shift=1, display = False) :
 
     for frame_number in tqdm(range(len(frame_list))):
         if frame_number != len(frame_list)-1:
+            current_frame = cv2.resize(np.array(frame_list[frame_number]), (360, 640), interpolation=cv2.INTER_AREA)  # reshape frames on
+            next_frame = cv2.resize(np.array(frame_list[frame_number+frame_shift]), (360, 640), interpolation=cv2.INTER_AREA)  # reshape frames on
             
             # Getting current frame and next frame
-            current_frame = np.array(frame_list[frame_number])
-            next_frame = np.array(frame_list[frame_number+frame_shift])
+            # current_frame = np.array(frame_list[frame_number])
+            # next_frame = np.array(frame_list[frame_number+frame_shift])
 
             # Converting to grayscale
             current_frame = cv2.cvtColor(current_frame, cv2.COLOR_BGR2GRAY)
