@@ -4,7 +4,8 @@ import itertools
 from tqdm import tqdm
 
 
-def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dict_shots_order, min_shot_nb):
+def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dict_shots_order, min_shot_nb,
+                             downbeat_duration):
     """
     Function that generate an array of frame index selected for the summary and output the time in seconds before the
     most important frame in the summary.
@@ -17,12 +18,13 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
                                 key: shot number
                                 value: (shot mean, index of max value on the shot, (index first frame,index last frame))
            - min_shot_nb        : int -> minimum of shots that must be included in the summary
+           - downbeat_duration  : float  -> time duration in seconds between two downbeats
     Output:
            - summary_frames_index   : array of frame index selected for the summary
            - time_before_drop       : float -> time in seconds before the most important frame of the summary
     """
-
-    output_frames_nb = summary_duration * summary_fps  # convert output duration in seconds into frame number
+    downbeat_frames_nb = downbeat_duration * summary_fps  # convert downbeat duration in seconds into frames number
+    output_frames_nb = int(summary_duration * summary_fps)  # convert output duration in seconds into frames number
     nb_shots_used = 0  # count number of shots included in the summary
 
     while nb_shots_used < min_shot_nb:  # change percentage until the min of shots included in the summary is reached
@@ -31,7 +33,7 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
         summary_frames_index = []  # array of frame index selected
 
         # take key of best shot (ordered by shot mean value)
-        dict_mean_order=list(dict(sorted(dict_shots_order.items(), key=lambda item: item[1],reverse=True)).keys())
+        dict_mean_order = list(dict(sorted(dict_shots_order.items(), key=lambda item: item[1], reverse=True)).keys())
 
         # define best sho number
         if dict_mean_order[0] == list(dict_shots_order.keys())[0]:  # check if first histogram has the best shot mean
@@ -45,13 +47,19 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
             last_frame_index = value[2][1]  # last frame index of the current shot
 
             shot_frames_nb = last_frame_index - first_frame_index  # number of frames in shots
-            summary_shot_frames_nb = int(
-                shot_frames_nb * shot_percentage / 100)  # number of frames to select for the summary
+            summary_shot_frames_nb = shot_frames_nb * shot_percentage / 100  # number of frames to select for the
+            # summary
+
+            downbeat_counter = int(summary_shot_frames_nb / downbeat_frames_nb)  # number of downbeat in shot summary
+
+            summary_shot_frames_nb = int(downbeat_frames_nb * downbeat_counter)  # number of frames is a multiple of
+            # number of frames in a downbeat duration
 
             if summary_shot_frames_nb + summary_frames_nb > output_frames_nb:  # if length shot exceeds total frames
                 # number
-                summary_shot_frames_nb = output_frames_nb - summary_frames_nb  # complete by the number of frames
-                # missing
+                downbeat_counter = int((output_frames_nb - summary_frames_nb) / downbeat_frames_nb)  # calculate new
+                # downbeat counter that matches as much possible the number of frames missing
+                summary_shot_frames_nb = int(downbeat_frames_nb * downbeat_counter)  # new nb of frames for last shot
 
             slice_inf = value[1] - int(summary_shot_frames_nb / 2)  # lower bound index of selected frames
             slice_sup = value[1] - int(
@@ -78,8 +86,8 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
 
             nb_shots_used += 1  # increase shots number visited
 
-            if output_frames_nb - summary_frames_nb < summary_fps:  # break when we reach expected output video
-                # length or < one fps unit
+            if output_frames_nb - summary_frames_nb < downbeat_frames_nb:  # break when we reach expected output video
+                # length or < one downbeat unit
                 break
 
         shot_percentage -= 5  # update percentage -> decrease by 5%

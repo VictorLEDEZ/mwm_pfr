@@ -58,7 +58,7 @@ def visualization(frames_list, shots):
     fig.show()
 
 
-def define_shots(frames_list, videos_param, nb_shots, shot_percentage, show_viz=False):
+def define_shots(frames_list, videos_param, nb_shots, shot_percentage, downbeat_duration, show_viz=False):
     """
      Main function. Divide color difference histogram into a number of shots passed in inout parameter
 
@@ -67,11 +67,18 @@ def define_shots(frames_list, videos_param, nb_shots, shot_percentage, show_viz=
             videos_param        : dict -> key: file_path / value: [fps,width,height,first_frame_index,last_frame_index]
             nb_shots            : integer for the number of shots to return
             range_min           : integer -> number of FPS for minimum shot length
+            downbeat_duration   : float  -> time duration in seconds between two downbeats
             show_viz            : Boolean -> to visualize shots selection depending on color difference histogram
      Output:
            shots: array of frame index defined as shots separations
     """
     frames_list = list(itertools.chain(*frames_list))  # flatten list
+
+    min_fps = list(dict(sorted(videos_param.items(), key=lambda item: item[1])).values())[0][0]  # minimal fps in dict
+
+    downbeat_frames_nb = downbeat_duration * min_fps  # convert downbeat duration in seconds into frames number
+
+    print("DOWNBEAT Frames:",downbeat_frames_nb)
 
     list_hist_diff = compute_videos_hist(
         frames_list)  # call function to calculate the color difference histogram for each frame
@@ -83,16 +90,11 @@ def define_shots(frames_list, videos_param, nb_shots, shot_percentage, show_viz=
     shots_index = [0, n]  # add first and last frame as default shots
     for i, val in enumerate(largest_indices):  # loop over invert order list
 
-        for param in videos_param.values():  # select fps of the frame index
-            if val <= param[4]:  # check index < or equal to first frame index of a video
-                fps = param[0]
-                break
-
         valid = False  # flag: possible to add frame in shot list or not
 
-        for j in shots_index:  # determine min shot length as (100/shot_percentage)*fps
-            if np.abs(j - val) > (100/shot_percentage) * fps:  # check if a frame at (100/shot_percentage)*fps range
-                # is not already a shot
+        for j in shots_index:  # defines minimal shot length as (100/shot_percentage) * downbeat_frames_nb
+            if np.abs(j - val) > (100/shot_percentage) * downbeat_frames_nb:  # check if a frame at range
+                # (100/shot_percentage)*downbeat_frames_nb is not already in list of shots
                 valid = True
             else:
                 valid = False
