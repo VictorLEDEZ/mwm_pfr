@@ -47,30 +47,34 @@ def get_audio_sequence(boundaries, labels, amplitudes, beat_times, downbeat_time
 
     t_start_max = boundaries[max_amplitude_index - 1]
 
-    t_start_sequence = t_start_max - t_before_peak
+    downbeat_peak_after = all_segments[max_amplitude_index]["downbeats"][0]
+    downbeat_peak_before = all_segments[max_amplitude_index -
+                                        1]["downbeats"][-1]
+
+    t_downbeat_max = min([downbeat_peak_before, downbeat_peak_after],
+                         key=lambda x: abs(x-t_start_max))
+
+    t_start_sequence = t_downbeat_max - t_before_peak
     t_end_sequence = t_start_sequence + duration
 
-    # beat_peak = all_segments[max_amplitude_index]["beats"][0] TO BE TESTED
-    # downbeat_peak = all_segments[max_amplitude_index]["downbeats"][0] TO BE TESTED
+    # picked_segments = []
+    # for i, segment in enumerate(all_segments):
 
-    picked_segments = []
-    for i, segment in enumerate(all_segments):
+    #     if ((t_start_sequence <= segment['t_start'] <= t_end_sequence) | (t_start_sequence <= segment['t_end'] <= t_end_sequence)):
 
-        if ((t_start_sequence <= segment['t_start'] <= t_end_sequence) | (t_start_sequence <= segment['t_end'] <= t_end_sequence)):
+    #         t_start = t_start_sequence if (
+    #             t_start_sequence >= segment['t_start']) else segment['t_start']
+    #         t_end = t_end_sequence if (
+    #             t_end_sequence <= segment['t_end']) else segment['t_end']
 
-            t_start = t_start_sequence if (
-                t_start_sequence >= segment['t_start']) else segment['t_start']
-            t_end = t_end_sequence if (
-                t_end_sequence <= segment['t_end']) else segment['t_end']
+    #         picked_segment = {
+    #             "mean_amplitude": amplitudes[i],
+    #             "t_start": t_start,
+    #             "t_end": t_end,
+    #             "beats": list(filter(lambda beat_time: (beat_time >= t_start) & (beat_time < t_end), beat_times)),
+    #             "downbeats": list(filter(lambda downbeat_time: (downbeat_time >= t_start) & (downbeat_time < t_end), downbeat_times)),
+    #         }
 
-            picked_segment = {
-                "mean_amplitude": amplitudes[i],
-                "t_start": t_start,
-                "t_end": t_end,
-                "beats": list(filter(lambda beat_time: (beat_time >= t_start) & (beat_time < t_end), beat_times)),
-                "downbeats": list(filter(lambda downbeat_time: (downbeat_time >= t_start) & (downbeat_time < t_end), downbeat_times)),
-            }
+    #         picked_segments.append(picked_segment)
 
-            picked_segments.append(picked_segment)
-
-    return all_segments, picked_segments, t_start_max
+    return all_segments, t_start_sequence, t_downbeat_max, t_end_sequence

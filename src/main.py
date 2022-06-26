@@ -1,14 +1,17 @@
-from video_features.shot_detection import define_shots
-from video_features.score import score
-from video_features.main import (create_clip, ordering_videos,
-                                 read_and_save_frames, summary_param)
+import pathlib
+import sys
+import warnings
+
+from music_features.beat_tracking import get_downbeats
+from music_features.config.main import AUDIO_PATH, SAMPLING_RATE
+from music_features.main import music_features
 from video_features.generate_summary import (create_summary,
                                              summary_frames_selection)
-from music_features.main import music_features
-from music_features.config.main import AUDIO_PATH, SAMPLING_RATE
-import sys
-import pathlib
-import warnings
+from video_features.main import (create_clip, ordering_videos,
+                                 read_and_save_frames, summary_param)
+from video_features.score import score
+from video_features.shot_detection import define_shots
+
 warnings.filterwarnings("ignore")
 
 
@@ -41,6 +44,8 @@ if __name__ == '__main__':
 
     frames_list, videos_param = read_and_save_frames(videos_order)
 
+    downbeats_frequency, downbeat_times = get_downbeats(AUDIO_PATH)
+
     nb_shots = 10
     shots = define_shots(frames_list, videos_param,
                          nb_shots, shot_percentage, show_viz=True)
@@ -57,8 +62,10 @@ if __name__ == '__main__':
     print('time before drop:', time_before_drop)
     print("total duration summary", summary_duration)
 
-    all_segments, picked_segments, downbeat_start, t_peak, downbeat_end, offset_start, offset_end = music_features(
-        AUDIO_PATH, summary_duration, SAMPLING_RATE, time_before_drop, printing=False, plotting=False)
+    all_segments, t_start_sequence, t_downbeat_max, t_end_sequence = music_features(
+        AUDIO_PATH, summary_duration, SAMPLING_RATE, time_before_drop, downbeat_times, printing=False, plotting=False)
+
+    # ! remove offsets
 
     summary_frames_index = summary_frames_index[int(
         summary_fps*offset_start): len(summary_frames_index)-int((summary_fps*offset_end))]

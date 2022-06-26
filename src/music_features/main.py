@@ -10,7 +10,7 @@ from music_features.music_amplitude import get_music_amplitude
 from music_features.music_structure import get_structure
 
 
-def music_features(audio_path, duration, sampling_rate, t_before_start, printing=True, plotting=True):
+def music_features(audio_path, duration, sampling_rate, t_before_start, downbeat_times, printing=True, plotting=True):
     """Get the audio features and cuts the audio
 
     Args:
@@ -29,19 +29,11 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
 
     amplitudes = get_music_amplitude(audio_path, boundaries)
     beat_times = get_beats(audio_path)
-    downbeat_times = get_downbeats(audio_path)
 
-    all_segments, picked_segments, t_peak = get_audio_sequence(
+    all_segments, t_start_sequence, t_downbeat_max, t_end_sequence = get_audio_sequence(
         boundaries, labels, amplitudes, beat_times, downbeat_times, duration, t_before_start)
 
-    downbeat_start = picked_segments[0]['downbeats'][0]
-    downbeat_end = picked_segments[-1]['downbeats'][-1]
-
-    offset_start = round(
-        abs(downbeat_start - picked_segments[0]['t_start']), 1)
-    offset_end = round(abs(picked_segments[-1]['t_end'] - downbeat_end), 1)
-
-    cut_music(downbeat_start, downbeat_end, audio_path)
+    cut_music(t_start_sequence, t_end_sequence, audio_path)
 
     # print the results
     if (printing == True):
@@ -51,24 +43,12 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
         print('----------------------------------------------------------------------')
 
         print('----------------------------------------------------------------------')
-        print('PICKED SEGMENTS:')
-        print(picked_segments)
-        print('----------------------------------------------------------------------')
-
-        print('----------------------------------------------------------------------')
         print('DOWNBEAT START:')
-        print('-> ' + str(downbeat_start))
-        print('TIME PEAK:')
-        print('-> ' + str(t_peak))
+        print('-> ' + str(t_start_sequence))
+        print('DOWNBEAT PEAK:')
+        print('-> ' + str(t_downbeat_max))
         print('DOWNBEAT END:')
-        print('-> ' + str(downbeat_end))
-        print('----------------------------------------------------------------------')
-
-        print('----------------------------------------------------------------------')
-        print('OFFSET START:')
-        print('-> ' + str(offset_start))
-        print('OFFSET END:')
-        print('-> ' + str(offset_end))
+        print('-> ' + str(t_end_sequence))
         print('----------------------------------------------------------------------')
 
     # plot the cut
@@ -77,13 +57,13 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
     if (plotting == True):
         plt.plot(time, aggregation)
 
-        plt.vlines(downbeat_start, 0, np.max(aggregation),
+        plt.vlines(t_start_sequence, 0, np.max(aggregation),
                    linestyles="dashed", colors="red")
 
-        plt.vlines(t_peak, 0, np.max(aggregation),
+        plt.vlines(t_downbeat_max, 0, np.max(aggregation),
                    linestyles="dashed", colors="green")
 
-        plt.vlines(downbeat_end, 0, np.max(aggregation),
+        plt.vlines(t_end_sequence, 0, np.max(aggregation),
                    linestyles="dashed", colors="red")
 
         plt.title(f'Music Structure of: {audio_path}')
@@ -91,4 +71,4 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
         plt.ylabel('Amplitude')
         plt.show()
 
-    return all_segments, picked_segments, downbeat_start, t_peak, downbeat_end, offset_start, offset_end
+    return all_segments, t_start_sequence, t_downbeat_max, t_end_sequence

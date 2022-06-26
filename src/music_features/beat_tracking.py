@@ -77,7 +77,7 @@ def get_downbeats(audio_path):
 
     downbeat_times = [x / 100 for x in downbeats_index]
 
-    return downbeat_times
+    return downbeats_frequency, downbeat_times
 
 
 def get_beats(audio_path):
