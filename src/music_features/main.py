@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from music_features.aggregation_structure_amplitude import \
     aggregate_structure_amplitude
 from music_features.audio_sequence import get_audio_sequence
-from music_features.beat_tracking import get_beats
+from music_features.beat_tracking import get_beats, get_downbeats
 from music_features.cut_music import cut_music
 from music_features.music_amplitude import get_music_amplitude
 from music_features.music_structure import get_structure
@@ -29,17 +29,19 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
 
     amplitudes = get_music_amplitude(audio_path, boundaries)
     beat_times = get_beats(audio_path)
+    downbeat_times = get_downbeats(audio_path)
 
     all_segments, picked_segments, t_peak = get_audio_sequence(
-        boundaries, labels, amplitudes, beat_times, duration, t_before_start)
+        boundaries, labels, amplitudes, beat_times, downbeat_times, duration, t_before_start)
 
-    beat_start = picked_segments[0]['beats'][0]
-    beat_end = picked_segments[-1]['beats'][-1]
+    downbeat_start = picked_segments[0]['downbeats'][0]
+    downbeat_end = picked_segments[-1]['downbeats'][-1]
 
-    offset_start = round(abs(beat_start - picked_segments[0]['t_start']), 1)
-    offset_end = round(abs(picked_segments[-1]['t_end'] - beat_end), 1)
+    offset_start = round(
+        abs(downbeat_start - picked_segments[0]['t_start']), 1)
+    offset_end = round(abs(picked_segments[-1]['t_end'] - downbeat_end), 1)
 
-    cut_music(beat_start, beat_end, audio_path)
+    cut_music(downbeat_start, downbeat_end, audio_path)
 
     # print the results
     if (printing == True):
@@ -54,12 +56,12 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
         print('----------------------------------------------------------------------')
 
         print('----------------------------------------------------------------------')
-        print('BEAT START:')
-        print('-> ' + str(beat_start))
+        print('DOWNBEAT START:')
+        print('-> ' + str(downbeat_start))
         print('TIME PEAK:')
         print('-> ' + str(t_peak))
-        print('BEAT END:')
-        print('-> ' + str(beat_end))
+        print('DOWNBEAT END:')
+        print('-> ' + str(downbeat_end))
         print('----------------------------------------------------------------------')
 
         print('----------------------------------------------------------------------')
@@ -75,13 +77,13 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
     if (plotting == True):
         plt.plot(time, aggregation)
 
-        plt.vlines(beat_start, 0, np.max(aggregation),
+        plt.vlines(downbeat_start, 0, np.max(aggregation),
                    linestyles="dashed", colors="red")
 
         plt.vlines(t_peak, 0, np.max(aggregation),
                    linestyles="dashed", colors="green")
 
-        plt.vlines(beat_end, 0, np.max(aggregation),
+        plt.vlines(downbeat_end, 0, np.max(aggregation),
                    linestyles="dashed", colors="red")
 
         plt.title(f'Music Structure of: {audio_path}')
@@ -89,4 +91,4 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, printing
         plt.ylabel('Amplitude')
         plt.show()
 
-    return all_segments, picked_segments, beat_start, t_peak, beat_end, offset_start, offset_end
+    return all_segments, picked_segments, downbeat_start, t_peak, downbeat_end, offset_start, offset_end
