@@ -1,17 +1,16 @@
+from video_features.shot_detection import define_shots
+from video_features.score import score
+from video_features.main import (create_clip, ordering_videos,
+                                 read_and_save_frames, summary_param)
+from video_features.generate_summary import (create_summary,
+                                             summary_frames_selection)
+from music_features.main import music_features
+from music_features.config.main import AUDIO_PATH, SAMPLING_RATE
+import sys
+import pathlib
 import warnings
 warnings.filterwarnings("ignore")
 
-import pathlib
-import sys
-
-from music_features.config.main import AUDIO_PATH, SAMPLING_RATE
-from music_features.main import music_features
-from video_features.generate_summary import (create_summary,
-                                             summary_frames_selection)
-from video_features.main import (create_clip, ordering_videos,
-                                 read_and_save_frames, summary_param)
-from video_features.score import score
-from video_features.shot_detection import define_shots
 
 if __name__ == '__main__':
 
@@ -58,11 +57,11 @@ if __name__ == '__main__':
     print('time before drop:', time_before_drop)
     print("total duration summary", summary_duration)
 
-
-    all_segments, picked_segments, beat_start, t_peak, beat_end, offset_start, offset_end = music_features(
+    all_segments, picked_segments, downbeat_start, t_peak, downbeat_end, offset_start, offset_end = music_features(
         AUDIO_PATH, summary_duration, SAMPLING_RATE, time_before_drop, printing=False, plotting=False)
 
-    summary_frames_index = summary_frames_index[int(summary_fps*offset_start) : len(summary_frames_index)-int((summary_fps*offset_end))]
+    summary_frames_index = summary_frames_index[int(
+        summary_fps*offset_start): len(summary_frames_index)-int((summary_fps*offset_end))]
 
     create_summary(frames_list, summary_frames_index,
                    summary_path, summary_resolution, summary_fps)
