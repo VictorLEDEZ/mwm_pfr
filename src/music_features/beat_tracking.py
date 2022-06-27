@@ -45,6 +45,8 @@ def get_downbeats(audio_path):
         array: array of times for each downbeats
     """
 
+    sampling_per_seconds = 100
+
     proc = madmom.features.downbeats.RNNDownBeatProcessor()
     beat_probabilities = proc(audio_path)
 
@@ -75,7 +77,9 @@ def get_downbeats(audio_path):
 
     downbeats_index = list(filter(lambda a: a != 0, downbeats_index))
 
-    downbeat_times = [x / 100 for x in downbeats_index]
+    downbeat_times = [x / sampling_per_seconds for x in downbeats_index]
+
+    downbeats_frequency = downbeats_frequency / sampling_per_seconds
 
     return downbeats_frequency, downbeat_times
 
