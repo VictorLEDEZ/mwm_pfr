@@ -37,8 +37,7 @@ if __name__ == '__main__':
     audio_sequence_path = pathlib.Path(__file__).parent.joinpath(
         'music_features/audio_sequence.wav')
 
-    # print(summary_path)
-    # print(audio_sequence_path)
+    AUDIO_PATH = str(AUDIO_PATH)  # convert pathlib to string
 
     videos_order = ordering_videos(videos_path)
 
