@@ -1,4 +1,5 @@
 from pydub import AudioSegment
+import pathlib
 
 
 def cut_music(t1, t2, audio_path):
@@ -16,4 +17,5 @@ def cut_music(t1, t2, audio_path):
     newAudio = AudioSegment.from_wav(audio_path)
     newAudio = newAudio[t1:t2]
 
-    newAudio.export('src/music_features/audio_sequence.wav', format="wav")
+    newAudio.export(pathlib.Path(__file__).parent.joinpath(
+    "audio_sequence.wav"), format="wav")
