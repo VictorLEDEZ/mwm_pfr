@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from music_features.aggregation_structure_amplitude import \
     aggregate_structure_amplitude
 from music_features.audio_sequence import get_audio_sequence
-from music_features.beat_tracking import get_beats, get_downbeats
+from music_features.beat_tracking import get_beats
 from music_features.cut_music import cut_music
 from music_features.music_amplitude import get_music_amplitude
 from music_features.music_structure import get_structure
