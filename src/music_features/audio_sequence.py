@@ -42,8 +42,9 @@ def get_audio_sequence(boundaries, labels, amplitudes, beat_times, downbeat_time
     max_amplitude_index = np.argmax(amplitudes)
     max_amplitude_label = labels[max_amplitude_index]
 
-    while(max_amplitude_label == labels[max_amplitude_index - 1]):
-        max_amplitude_index = max_amplitude_index - 1
+    # while(max_amplitude_label == labels[max_amplitude_index - 1]):
+    # max_amplitude_index = max_amplitude_index - 1
+    max_amplitude_index = list(labels).index(labels[max_amplitude_index])
 
     t_start_max = boundaries[max_amplitude_index - 1]
 
