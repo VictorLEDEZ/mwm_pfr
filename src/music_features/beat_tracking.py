@@ -45,6 +45,8 @@ def get_downbeats(audio_path):
         array: array of times for each downbeats
     """
 
+    print("GET DOWNBEATS PROCESSING ...")
+
     sampling_per_seconds = 100
 
     proc = madmom.features.downbeats.RNNDownBeatProcessor()
@@ -72,14 +74,16 @@ def get_downbeats(audio_path):
     downbeats_index = [i if downbeat == 1 else 0 for i,
                        downbeat in enumerate(downbeats)]
 
-    plt.plot(downbeats_index)
-    plt.show()
+    # plt.plot(downbeats_index)
+    # plt.show()
 
     downbeats_index = list(filter(lambda a: a != 0, downbeats_index))
 
     downbeat_times = [x / sampling_per_seconds for x in downbeats_index]
 
     downbeats_frequency = downbeats_frequency / sampling_per_seconds
+
+    print("GET DOWNBEATS DONE")
 
     return downbeats_frequency, downbeat_times
 
