@@ -114,6 +114,7 @@ def read_and_save_frames(videos_order):
 
         frames_list.append(video_list)  # add list
         pbar.update()
+        video_cap.release()
 
     pbar.close()
     frames_list = np.array(frames_list)
