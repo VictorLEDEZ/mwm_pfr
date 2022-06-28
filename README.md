@@ -1,6 +1,6 @@
-#Projet Fil Rouge MWM
+# Projet Fil Rouge MWM
 
-##Project structure
+## Project structure
 
 ```
 project_root/
@@ -14,7 +14,7 @@ project_root/
 
 ```
 
-##Installation
+## Installation
 
 - Cloner le projet à partir de la commande suivante : 
 	git clone https://github.com/VictorLEDEZ/mwm_pfr.git
