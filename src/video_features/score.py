@@ -37,7 +37,7 @@ def score(frame_list, shots, sampling_rate=10):
     # flow_video = []
     # obj_score_video = []
     dir = os.getcwd()
-    darkflow_path = pathlib.Path(__file__).parent.parent.joinpath("darkflow-mast")
+    darkflow_path = pathlib.Path(__file__).parent.parent.parent.joinpath("darkflow-mast")
     os.chdir(darkflow_path)
 
 
