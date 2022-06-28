@@ -50,6 +50,10 @@ def summary_frames_selection(summary_duration, summary_fps, shot_percentage, dic
             summary_shot_frames_nb = shot_frames_nb * shot_percentage / 100  # number of frames to select for the
             # summary
 
+            if summary_shot_frames_nb < downbeat_frames_nb:  # define minimum shot frames number when shot_percentage
+                # decrease
+                summary_shot_frames_nb = downbeat_frames_nb  # minimum one downbeat length
+
             downbeat_counter = int(summary_shot_frames_nb / downbeat_frames_nb)  # number of downbeat in shot summary
 
             summary_shot_frames_nb = int(downbeat_frames_nb * downbeat_counter)  # number of frames is a multiple of
@@ -121,9 +125,7 @@ def create_summary(frames_list, summary_frames_index, summary_filename, summary_
 
     for index, frame in enumerate(tqdm(frames_list)):  # loop over frame list & write frame if index in list selection
         if index in summary_frames_index:
-            frame_resized = cv2.resize(frame, summary_resolution, interpolation=cv2.INTER_AREA)  # reshape frames on
-            # the same resolution
-            out.write(frame_resized)
+            out.write(frame)
             # time.sleep(0.4)
     # When everything done, release the video capture and video write objects
     # Cleanup and save video

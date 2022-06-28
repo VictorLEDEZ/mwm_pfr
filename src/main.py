@@ -41,18 +41,18 @@ if __name__ == '__main__':
 
     videos_order = ordering_videos(videos_path)
 
-    frames_list, videos_param = read_and_save_frames(videos_order)
+    frames_list, summary_fps, summary_resolution = read_and_save_frames(videos_order)
 
     downbeats_frequency, downbeat_times = get_downbeats(AUDIO_PATH)  # need to change frequency to time in seconds
 
     nb_shots = 10
-    shots = define_shots(frames_list, videos_param, nb_shots, shot_percentage, downbeats_frequency,show_viz=True)
+    shots = define_shots(frames_list, summary_fps, nb_shots, shot_percentage, downbeats_frequency,show_viz=True)
 
-    summary_fps, summary_resolution = summary_param(videos_param)
+    #summary_fps, summary_resolution = summary_param(videos_param)
 
     dict_shots_order = score(frames_list, shots, sampling_rate=10)
 
-    min_shot_nb = len(videos_param)
+    min_shot_nb = len(videos_order)
 
     summary_frames_index, time_before_drop, summary_duration = summary_frames_selection(
         summary_duration, summary_fps, shot_percentage, dict_shots_order, min_shot_nb, downbeats_frequency)

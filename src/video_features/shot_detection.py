@@ -58,13 +58,13 @@ def visualization(frames_list, shots):
     fig.show()
 
 
-def define_shots(frames_list, videos_param, nb_shots, shot_percentage, downbeat_duration, show_viz=False):
+def define_shots(frames_list, min_fps, nb_shots, shot_percentage, downbeat_duration, show_viz=False):
     """
      Main function. Divide color difference histogram into a number of shots passed in inout parameter
 
      Input:
             frames_list         : array of arrays -> frames matrix for each video
-            videos_param        : dict -> key: file_path / value: [fps,width,height,first_frame_index,last_frame_index]
+            min_fps             : integer -> minimal frames per seconds rate
             nb_shots            : integer for the number of shots to return
             range_min           : integer -> number of FPS for minimum shot length
             downbeat_duration   : float  -> time duration in seconds between two downbeats
@@ -73,8 +73,6 @@ def define_shots(frames_list, videos_param, nb_shots, shot_percentage, downbeat_
            shots: array of frame index defined as shots separations
     """
     frames_list = list(itertools.chain(*frames_list))  # flatten list
-
-    min_fps = list(dict(sorted(videos_param.items(), key=lambda item: item[1])).values())[0][0]  # minimal fps in dict
 
     downbeat_frames_nb = downbeat_duration * min_fps  # convert downbeat duration in seconds into frames number
 

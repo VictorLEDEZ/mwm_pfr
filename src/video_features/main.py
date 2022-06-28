@@ -42,6 +42,39 @@ def ordering_videos(dir_path):
     # ordering dict by dateTime
     return videos_order
 
+def summary_param(videos_order):
+
+    """
+    Function that returns the parameters needed for the output summary video (fps & resolution).
+
+    Input:
+            - videos_order      : array of video's file path ordering by last modification date
+    Output:
+            - min_fps           : integer -> minimal frame per seconds found in all videos
+            - min_resolution    : tuple of integer -> minimal resolution found in all videos
+    """
+
+    fps_list = []
+    for idx, file in enumerate(videos_order):
+        video_cap = cv2.VideoCapture(file)
+
+        # width of video frame
+        width = int(video_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        # height of video frame
+        height = int(video_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        resolution = width * height
+        fps = int(round(video_cap.get(cv2.CAP_PROP_FPS)))  # fps of video frame
+
+        fps_list.append(fps)  # append fps to list
+        if idx == 0:  # init minimal resolution with first video
+            min_resolution = (width, height)
+        else:
+            # find new minimal resolution
+            if width * height < (min_resolution[0] * min_resolution[1]):
+                # update minimal resolution value
+                min_resolution = (width, height)
+    min_fps = np.min(fps_list)  # select minimal fps in fps list
+    return min_fps, min_resolution
 
 def read_and_save_frames(videos_order):
     """
@@ -52,73 +85,39 @@ def read_and_save_frames(videos_order):
             - videos_order      : array of video's file path ordering by last modification date
     Output:
             - frames_list       : array of arrays -> frames matrix for each video
-            - dict_videos_param : dict -> key: file_path / value: [fps,width,height,first_frame_index,last_frame_index]
+            - min_fps           : integer -> minimal fps found in all videos
+            - min_resolution    : tuple of integers -> minimal resolution found in all videos
     """
+
+    min_fps, min_resolution = summary_param(videos_order)
 
     pbar = tqdm(desc='Video', total=len(videos_order),
                 position=0, leave=True)  # create loading bar
 
     frames_list = []  # array of arrays
-    dict_videos_param = {}  # dict for parameters of each video
     frame_nb = 0  # number of total frames counter
-    first_frame_index = 0
     for file in videos_order:  # loop over all videos in the directory
         video_list = []  # frame list for each video
         filename = file.split("/")[-1]  # extract file name from file path
         pbar.set_description(f'Videos -> {filename}')  # tqdm bar description
         pbar.refresh()  # to show immediately the update
-        vidcap = cv2.VideoCapture(file)
+        video_cap = cv2.VideoCapture(file)
 
-        # width of video frame
-        width = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        # height of video frame
-        height = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fps = int(round(vidcap.get(cv2.CAP_PROP_FPS)))  # fps of video frame
-
-        success, image = vidcap.read()  # start reading with frame
+        success, frame = video_cap.read()  # start reading with frame
 
         while success:  # keep reading until .read() return True
-            video_list.append(np.asarray(image))  # append frame to video list
-            success, image = vidcap.read()
+            frame_resized = cv2.resize(frame, min_resolution, interpolation=cv2.INTER_AREA)  # reshape frames on
+            # the same resolution (minimum resolution)
+            video_list.append(np.asarray(frame_resized))  # append frame to video list
+            success, frame = video_cap.read()
             frame_nb += 1  # upgrade number of frames counter
 
         frames_list.append(video_list)  # add list
-        last_frame_index = frame_nb  # keep last frame index of video
         pbar.update()
-        dict_videos_param[file] = [fps, width, height, first_frame_index,
-                                   last_frame_index]  # add video parameters to dict
-        # update first frame index for next video
-        first_frame_index = last_frame_index + 1
 
     pbar.close()
     frames_list = np.array(frames_list)
-    return frames_list, dict_videos_param
-
-
-def summary_param(dict_videos_param):
-    """
-    Function that returns the parameters needed for the output summary video (fps & resolution).
-
-    Input:
-            - dict_videos_param : dict -> key: file_path / value: [fps,width,height,first_frame_index,last_frame_index]
-    Output:
-            - min_fps           : minimal frame per seconds found in all videos
-            - min_resolution    : minimal resolution found in all videos
-    """
-
-    fps_list = []  # list of fps
-    # loop over dictionary values
-    for i, param in enumerate(dict_videos_param.values()):
-        fps_list.append(param[0])  # append fps to list
-        if i == 0:  # init minimal resolution with first video
-            min_resolution = (param[1], param[2])
-        else:
-            # find new minimal resolution
-            if param[1] * param[2] < (min_resolution[0] * min_resolution[1]):
-                # update minimal resolution value
-                min_resolution = (param[1], param[2])
-    min_fps = np.min(fps_list)  # select minimal fps in fps list
-    return min_fps, min_resolution
+    return frames_list, min_fps, min_resolution
 
 
 def create_clip(summary_video_path, audio_path, clip_filename):
