@@ -47,8 +47,7 @@ def score(frame_list, shots, sampling_rate=10):
         for video in tqdm(frame_list):
             # for frame_number in range(len(video)):
             # if frame_number%sampling_rate==0:
-            sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False,
-                            save_video=False)  # PATENTED ?
+            sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False)  # PATENTED ?
             flow_video = Flow(video[::sampling_rate], frame_shift=1,
                             display=False)
             obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
