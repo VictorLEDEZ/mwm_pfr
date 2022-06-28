@@ -41,7 +41,7 @@ def score(frame_list, shots, sampling_rate=10):
     os.chdir(darkflow_path)
 
 
-    active_sift = False
+    active_sift = True
 
     if active_sift == True:
         for video in tqdm(frame_list):
