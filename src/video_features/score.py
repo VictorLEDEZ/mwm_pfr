@@ -7,6 +7,7 @@ from video_features.object_det_score import object_det_score
 from video_features.shot_detection import define_shots
 from video_features.shots_order import shots_order
 from tqdm import tqdm 
+import pathlib
 
 import os
 from pathlib import Path
@@ -36,7 +37,8 @@ def score(frame_list, shots, sampling_rate=10):
     # flow_video = []
     # obj_score_video = []
     dir = os.getcwd()
-    os.chdir("./darkflow-mast")
+    darkflow_path = pathlib.Path(__file__).parent.parent.joinpath("darkflow-mast")
+    os.chdir(darkflow_path)
 
 
     active_sift = False
