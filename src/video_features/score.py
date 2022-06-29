@@ -74,18 +74,17 @@ def score(frame_list, shots, sampling_rate=10):
         flow.append(flow_tmp)
         obj_score.append(obj_score_tmp)
 
-        # Normalization
-        for video in range(len(sift)):
-            sift_norm.append(np.array(sift[video]) / max_sift)
-            flow_norm.append(np.array(flow[video]) / max_flow)
-            obj_score_norm.append(np.array(obj_score[video]) / max_object_score)
+    # Normalization
+    for video in range(len(sift)):
+        sift_norm.append(np.array(sift[video]) / max_sift)
+        flow_norm.append(np.array(flow[video]) / max_flow)
+        obj_score_norm.append(np.array(obj_score[video]) / max_object_score)
 
     os.chdir(dir)
 
     # Agregation of the 3 scores
     def agregation(flow=flow_norm, sift=sift_norm, obj=obj_score_norm, flow_coef=0.5, sift_coef=0.5, obj_coef=1):
-        agreg = [flow_coef*flow[i] + sift_coef*sift[i] +
-                 obj_coef*obj_score[i] for i in range(len(flow))]
+        agreg = [flow_coef*flow[i] + sift_coef*sift[i] + obj_coef*obj_score[i] for i in range(len(flow))]
         return agreg
 
     agreg = agregation(flow=flow_norm, sift=sift_norm,
