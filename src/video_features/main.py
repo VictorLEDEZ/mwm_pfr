@@ -136,8 +136,9 @@ def create_clip(summary_video_path, audio_path, clip_filename):
 
     input_audio = ffmpeg.input(str(audio_path))
 
-    # ffmpeg.concat(input_video, input_audio, v=1, a=1).output(
-    #     clip_filename+'.mp4').run()
-
-    ffmpeg.concat(input_video, input_audio, v=1, a=1).output(
-        clip_filename+'.mp4').run(cmd=r'C:\Users\RamziG5\anaconda3\envs\pfr\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win64-v4.2.2.exe')
+    if platform.system() == 'Windows':
+        ffmpeg.concat(input_video, input_audio, v=1, a=1).output(
+            clip_filename+'.mp4').run(cmd=r'C:\Users\RamziG5\anaconda3\envs\pfr\Lib\site-packages\imageio_ffmpeg\binaries\ffmpeg-win64-v4.2.2.exe')
+    else:
+        ffmpeg.concat(input_video, input_audio, v=1, a=1).output(
+             clip_filename+'.mp4').run()
