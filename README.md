@@ -16,19 +16,19 @@ project_root/
 
 ## Installation
 
-- Cloner le projet à partir de la commande suivante : \newline
+- Cloner le projet à partir de la commande suivante : <br/>
 git clone https://github.com/VictorLEDEZ/mwm_pfr.git
 - Récupérer le sous-module darkflow-mast pour la détection d'objets : 
 	- git submodule init
 	- git submodule update
-- Créer un environnement avec la version 3.7 de python à partir de la commande suivante : \newline
+- Créer un environnement avec la version 3.7 de python à partir de la commande suivante : <br/>
 conda create --name myenv --file requirements.txt python=3.7.13
-- Activer myenv avec la commande ci-dessous : \newline
+- Activer myenv avec la commande ci-dessous : <br/>
 conda activate myenv
 - Installer les libraires madmom et sf_segmenter avec les commandes suivantes : 
 	- pip install madmom
 	- pip install sf-segmenter
-- Utiliser la commande suivante depuis le dossier darkflow-mast : \newline
+- Utiliser la commande suivante depuis le dossier darkflow-mast : <br/>
 pip install .
 - Créer un dossier bin au dossier darkflow-mast
 - Ajouter les poids du réseau de neurones (ex : yolo.weights) dans le dossier bin 
