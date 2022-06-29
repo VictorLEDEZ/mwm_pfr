@@ -31,4 +31,5 @@ conda activate myenv
 - Utiliser la commande suivante depuis le dossier darkflow-mast : <br/>
 pip install .
 - Créer un dossier bin au dossier darkflow-mast
-- Ajouter les poids du réseau de neurones (ex : yolo.weights) dans le dossier bin 
+- Ajouter les poids du réseau de neurones (ex : yolo.weights) dans le dossier bin. 
+Les poids peuvent être téléchargés à partir de ce [lien](https://drive.google.com/drive/folders/0B1tW_VtY7onidEwyQ2FtQVplWEU?resourcekey=0-s5xkbwFqbiBW2QEqj98vkQ).
