@@ -17,36 +17,42 @@ warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
 
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 6:
         print("""
         Four arguments are required:
             - The first argument should be the path to the videos directory
-            - The second argument is the name of the clip
-            - The third argument is an integer for the summary duration time in seconds
-            - The fourth argument is an integer for the percentage of one shot summary
+            - The second argument should be the name of the audio file (e.g. PharrellWilliams_Happy)
+            - The third argument is the name of the clip
+            - The fourth argument is an integer for the summary duration time in seconds
+            - The fifth argument is an integer for the percentage of one shot summary
             """)
         sys.exit(0)
 
     videos_path = sys.argv[1]
-    clip_filename = sys.argv[2]
-    summary_duration = int(sys.argv[3])
-    shot_percentage = int(sys.argv[4])
+    music = str(sys.argv[2]) + '.wav'
+    clip_filename = sys.argv[3]
+    summary_duration = int(sys.argv[4])
+    shot_percentage = int(sys.argv[5])
 
     summary_path = pathlib.Path(__file__).parent.joinpath(
         'video_features/summary.mp4')
     audio_sequence_path = pathlib.Path(__file__).parent.joinpath(
         'music_features/audio_sequence.wav')
 
+    AUDIO_PATH = pathlib.Path(__file__).parent.joinpath(
+        'music_features/audio_samples').joinpath(music)
     AUDIO_PATH = str(AUDIO_PATH)  # convert pathlib to string
 
     videos_order = ordering_videos(videos_path)
 
-    frames_list, summary_fps, summary_resolution = read_and_save_frames(videos_order)
+    frames_list, summary_fps, summary_resolution = read_and_save_frames(
+        videos_order)
 
     downbeats_frequency, downbeat_times = get_downbeats(AUDIO_PATH)
 
     nb_shots = 10
-    shots = define_shots(frames_list, summary_fps, nb_shots, shot_percentage, downbeats_frequency,show_viz=True)
+    shots = define_shots(frames_list, summary_fps, nb_shots,
+                         shot_percentage, downbeats_frequency, show_viz=True)
 
     dict_shots_order = score(frames_list, shots, sampling_rate=10)
 
