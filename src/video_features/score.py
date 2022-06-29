@@ -9,19 +9,27 @@ from video_features.shots_order import shots_order
 from tqdm import tqdm 
 import pathlib
 
+import plotly.express as px
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
 import os
 from pathlib import Path
-import numpy as np  # Change obj to np array (to remove)
+import numpy as np
 
 
 def score(frame_list, shots, sampling_rate=10):
-    def normalize(flow_mean):
-        return (flow_mean - np.min(flow_mean)) / (np.max(flow_mean) - np.min(flow_mean))
-    # Video Path
-    # data_path = os.path.join(Path(os.getcwd()).parent.parent.absolute(), "Data")
-    # video_path = os.path.join(data_path, "cut.mp4")
+    """
+    Function that computes SIFT, Optical Flow and Object Detection.
+    Then, calculate the score of each frame for each feature then order the shots by score.
 
-    # Run
+    Input:
+           - frame_list         : list -> list of video frames
+           - shots              : list -> list of video shot
+           - sampling_rate      : int -> rate of frame for computation
+    Output:
+           - dict_shot_order    : dictionnary of score for each shot
+    """
     sift = []
     flow = []
     obj_score = []
@@ -33,54 +41,38 @@ def score(frame_list, shots, sampling_rate=10):
     max_flow = 0
     max_object_score = 0
 
-    # sift_video = []
-    # flow_video = []
-    # obj_score_video = []
     dir = os.getcwd()
     darkflow_path = pathlib.Path(__file__).parent.parent.parent.joinpath("darkflow-mast")
     os.chdir(darkflow_path)
 
+    # Compute SIFT, Optical Flow, Object Detection
+    for video in tqdm(frame_list):
+        sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False)
+        flow_video = Flow(video[::sampling_rate], frame_shift=1,
+                        display=False)
+        obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
 
-    active_sift = True
+        sift_tmp = []
+        flow_tmp = []
+        obj_score_tmp = []
 
-    if active_sift == True:
-        for video in tqdm(frame_list):
-            # for frame_number in range(len(video)):
-            # if frame_number%sampling_rate==0:
-            sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False)  # PATENTED ?
-            flow_video = Flow(video[::sampling_rate], frame_shift=1,
-                            display=False)
-            obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
+        # Get maximum score for normalization
+        if max(sift_video) > max_sift:
+            max_sift = max(sift_video)
+        if max(flow_video) > max_flow:
+            max_flow = max(flow_video)
+        if max(obj_score_video) > max_object_score:
+            max_object_score = max(obj_score_video)
 
-            # sift_video.append(Sift(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate)) # PATENTED ?
-            # flow_video.append(Flow(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate))
-            # obj_score_video.append(object_det_score(video[::sampling_rate], gpu=1)[1])
-            # frame_number += 1
+        for i, j, k in zip(sift_video, flow_video, obj_score_video):
+            for s in range(sampling_rate):
+                sift_tmp.append(i)
+                flow_tmp.append(j)
+                obj_score_tmp.append(k)
 
-            # sift_norm = [np.zeros(flow[i].shape) for i in range(len(flow))]     # !!!!!!!! #
-            sift_tmp = []
-            flow_tmp = []
-            obj_score_tmp = []
-
-            if max(sift_video) > max_sift:
-                max_sift = max(sift_video)
-            if max(flow_video) > max_flow:
-                max_flow = max(flow_video)
-            if max(obj_score_video) > max_object_score:
-                max_object_score = max(obj_score_video)
-
-            for i, j, k in zip(sift_video, flow_video, obj_score_video):
-                for s in range(sampling_rate):
-                    sift_tmp.append(i)
-                    flow_tmp.append(j)
-                    obj_score_tmp.append(k)
-
-            sift.append(sift_tmp)
-            flow.append(flow_tmp)
-            obj_score.append(obj_score_tmp)
-
-        # print(np.shape(sift))
-        # print(np.shape(sift[0]))
+        sift.append(sift_tmp)
+        flow.append(flow_tmp)
+        obj_score.append(obj_score_tmp)
 
         # Normalization
         for video in range(len(sift)):
@@ -88,61 +80,9 @@ def score(frame_list, shots, sampling_rate=10):
             flow_norm.append(np.array(flow[video]) / max_flow)
             obj_score_norm.append(np.array(obj_score[video]) / max_object_score)
 
-            # print("FLOW", flow)
-            # print("\n")
-
-            # sift2 = [i for i in sift_video for s in range(sampling_rate)]
-            # flow2 = [i for i in flow_video for s in range(sampling_rate)]
-            # obj_score2 = [i for i in obj_score for s in range(sampling_rate)]
-            # print("Flow2", flow2)
-
-        # print(flow.shape)
-        # print(sift.shape)
-        # print(obj_score.shape)
-
-    elif active_sift == False:
-        for video in tqdm(frame_list):
-            # for frame_number in range(len(video)):
-            # if frame_number%sampling_rate==0:
-            flow_video = Flow(video[::sampling_rate], frame_shift=1,
-                            display=False)
-            obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
-
-            # sift_video.append(Sift(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate)) # PATENTED ?
-            # flow_video.append(Flow(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate))
-            # obj_score_video.append(object_det_score(video[::sampling_rate], gpu=1)[1])
-            # frame_number += 1
-
-            sift_tmp = []
-            flow_tmp = []
-            obj_score_tmp = []
-
-            if max(flow_video) > max_flow:
-                max_flow = max(flow_video)
-            if max(obj_score_video) > max_object_score:
-                max_object_score = max(obj_score_video)
-
-            for j, k in zip(flow_video, obj_score_video):
-                for s in range(sampling_rate):
-                    flow_tmp.append(j)
-                    obj_score_tmp.append(k)
-
-            flow.append(flow_tmp)
-            obj_score.append(obj_score_tmp)
-
-        # print(np.shape(sift))
-        # print(np.shape(sift[0]))
-
-        # Normalization
-        for video in range(len(flow)):
-            flow_norm.append(np.array(flow[video]) / max_flow)
-            obj_score_norm.append(np.array(obj_score[video]) / max_object_score)
-
-        sift_norm = [np.zeros(flow_norm[i].shape) for i in range(len(flow))]     # !!!!!!!! #
-
-
     os.chdir(dir)
 
+    # Agregation of the 3 scores
     def agregation(flow=flow_norm, sift=sift_norm, obj=obj_score_norm, flow_coef=0.5, sift_coef=0.5, obj_coef=1):
         agreg = [flow_coef*flow[i] + sift_coef*sift[i] +
                  obj_coef*obj_score[i] for i in range(len(flow))]
@@ -156,17 +96,11 @@ def score(frame_list, shots, sampling_rate=10):
     agreg_obj_score = [inner for outer in obj_score_norm for inner in outer]
     agreg_agreg = [inner for outer in agreg for inner in outer]
 
-    # shots = define_shots(video_path, nb_shots=10)
     len_cum = np.cumsum([len(i) for i in flow_norm])
     dict_shots_order, df_order = shots_order(
         shots, agreg_agreg, len_cum, display=True)
 
-    ### To remove ###
-    import plotly.express as px
-    from plotly.subplots import make_subplots
-    import plotly.graph_objects as go
-
-    # len_cum = np.cumsum([len(i) for i in flow])
+    # Visualization
     frame_number = [i for i in range(0, len_cum[-1])]
 
     fig = make_subplots(rows=4, cols=1, subplot_titles=(
@@ -193,7 +127,6 @@ def score(frame_list, shots, sampling_rate=10):
     ), row=4, col=1)
     for i in len_cum[:-1]:
         fig.add_vline(x=i, line_dash="dash")
-    # title_text="Stacked Subplots"
     fig.update_layout(height=800, width=1000, showlegend=False)
     fig.show()
 
