@@ -3,6 +3,9 @@ import sys
 import warnings
 
 from music_features.beat_tracking import get_downbeats
+DARKFLOW_PATH = (pathlib.Path(__file__).parent.parent / "darkflow").absolute()
+sys.path.append(str(DARKFLOW_PATH))
+
 from music_features.config.main import AUDIO_PATH, SAMPLING_RATE
 from music_features.main import music_features
 from video_features.generate_summary import (create_summary,
@@ -16,6 +19,10 @@ warnings.filterwarnings("ignore")
 
 
 if __name__ == '__main__':
+    sys.argv.append(str(pathlib.Path(__file__).parent.joinpath('videos')))
+    sys.argv.append("output.mp4")
+    sys.argv.append("30")
+    sys.argv.append("50")
 
     if len(sys.argv) != 6:
         print("""

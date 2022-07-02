@@ -50,3 +50,9 @@ ckpt/*
 
 #pytest cache
 .cache/
+
+#IDE
+.idea
+
+#STREAMLIT
+src/.streamlit

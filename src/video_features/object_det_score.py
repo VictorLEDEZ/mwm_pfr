@@ -1,8 +1,9 @@
 #installer la version tensorflow-gpu==1.15.0rc2 pour utiliser la version darkflow de YOLO avec un GPU
 import tensorflow as tf
-from darkflow.net.build import TFNet
-import matplotlib.pyplot as plt
 import sys
+from pathlib import Path
+import matplotlib.pyplot as plt
+from darkflow.net.build import TFNet
 
 
 def thema(res):
@@ -141,7 +142,7 @@ def frame_score(res, row, col):
 #     return results_object_det, normed_scores
 
 
-def object_det_score(frame_list, model_path="cfg/yolo.cfg", weights_path="bin/yolo.weights", thresold_pred=0.6, gpu=0):
+def object_det_score(frame_list, model_path="cfg/yolo.cfg", weights_path="bin/yolo.weights", config_path="./cfg/", thresold_pred=0.6, gpu=0):
     '''
     fonction qui renvoie le score pour toutes les frames d'une vidéo
     frame_list: liste de frames (list)
@@ -152,10 +153,12 @@ def object_det_score(frame_list, model_path="cfg/yolo.cfg", weights_path="bin/yo
     return : une liste correspondant aux résultats de la détection d'objets dans chaque frame de la vidéo 
     et une liste correspondant aux scores dans chaque frame de la vidéo
     '''
-    options = {"model": model_path, 
-           "load": weights_path, 
-           "threshold": thresold_pred,
-           'gpu': gpu}
+    options = {
+        "model": model_path,
+        "load": weights_path,
+        "config": config_path,
+        "threshold": thresold_pred,
+        'gpu': gpu}
 
     frame_scores = []
     results_object_det = []
@@ -183,7 +186,12 @@ def main():
 
     filename = sys.argv[1]
 
-    scores = object_det_score(filename)
+    scores = object_det_score(
+        filename,
+        model_path=str(DARKFLOW_PATH / "cfg/yolo.cfg"),
+        weights_path=str(DARKFLOW_PATH / "bin/yolo.weights"),
+        config_path=str(DARKFLOW_PATH / "cfg"),
+    )
 
     return scores
 

@@ -15,7 +15,13 @@ import plotly.graph_objects as go
 
 import os
 from pathlib import Path
-import numpy as np
+
+import sys
+sys.path.append(str(Path(__file__).parent.parent.parent.joinpath("darkflow_v2")))
+import numpy as np  # Change obj to np array (to remove)
+
+
+DARKFLOW_PATH = Path(__file__).parent.parent.parent / "darkflow"
 
 
 def score(frame_list, shots, sampling_rate=10):
@@ -42,45 +48,53 @@ def score(frame_list, shots, sampling_rate=10):
     max_object_score = 0
 
     dir = os.getcwd()
-    darkflow_path = pathlib.Path(__file__).parent.parent.parent.joinpath("darkflow-mast")
-    os.chdir(darkflow_path)
 
-    # Compute SIFT, Optical Flow, Object Detection
-    for video in tqdm(frame_list):
-        sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False)
-        flow_video = Flow(video[::sampling_rate], frame_shift=1,
-                        display=False)
-        obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
+    # os.chdir("./darkflow_v2")
 
-        sift_tmp = []
-        flow_tmp = []
-        obj_score_tmp = []
+    active_sift = True
 
-        # Get maximum score for normalization
-        if max(sift_video) > max_sift:
-            max_sift = max(sift_video)
-        if max(flow_video) > max_flow:
-            max_flow = max(flow_video)
-        if max(obj_score_video) > max_object_score:
-            max_object_score = max(obj_score_video)
+    if active_sift == True:
+        for video in tqdm(frame_list):
+            # for frame_number in range(len(video)):
+            # if frame_number%sampling_rate==0:
+            sift_video = Sift(video[::sampling_rate], frame_shift=1, display=False,
+                            save_video=False)  # PATENTED ?
+            flow_video = Flow(video[::sampling_rate], frame_shift=1,
+                            display=False)
+            obj, obj_score_video = object_det_score(video[::sampling_rate], gpu=1)
 
-        for i, j, k in zip(sift_video, flow_video, obj_score_video):
-            for s in range(sampling_rate):
-                sift_tmp.append(i)
-                flow_tmp.append(j)
-                obj_score_tmp.append(k)
+            # sift_video.append(Sift(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate)) # PATENTED ?
+            # flow_video.append(Flow(video[::sampling_rate], frame_shift=1, display = False, save_video = False, sampling_rate=sampling_rate))
+            # obj_score_video.append(object_det_score(video[::sampling_rate], gpu=1)[1])
+            # frame_number += 1
 
-        sift.append(sift_tmp)
-        flow.append(flow_tmp)
-        obj_score.append(obj_score_tmp)
+            # sift_norm = [np.zeros(flow[i].shape) for i in range(len(flow))]     # !!!!!!!! #
+            sift_tmp = []
+            flow_tmp = []
+            obj_score_tmp = []
 
-        # Normalization
+            if max(sift_video) > max_sift:
+                max_sift = max(sift_video)
+            if max(flow_video) > max_flow:
+                max_flow = max(flow_video)
+            if max(obj_score_video) > max_object_score:
+                max_object_score = max(obj_score_video)
+
+            for i, j, k in zip(sift_video, flow_video, obj_score_video):
+                for s in range(sampling_rate):
+                    sift_tmp.append(i)
+                    flow_tmp.append(j)
+                    obj_score_tmp.append(k)
+
+            sift.append(sift_tmp)
+            flow.append(flow_tmp)
+            obj_score.append(obj_score_tmp)
+
         for video in range(len(sift)):
             sift_norm.append(np.array(sift[video]) / max_sift)
             flow_norm.append(np.array(flow[video]) / max_flow)
             obj_score_norm.append(np.array(obj_score[video]) / max_object_score)
 
-    os.chdir(dir)
 
     # Agregation of the 3 scores
     def agregation(flow=flow_norm, sift=sift_norm, obj=obj_score_norm, flow_coef=0.5, sift_coef=0.5, obj_coef=1):

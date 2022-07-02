@@ -1,8 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
-
-from music_features.aggregation_structure_amplitude import \
-    aggregate_structure_amplitude
+from music_features.aggregation_structure_amplitude import aggregate_structure_amplitude
 from music_features.audio_sequence import get_audio_sequence
 from music_features.beat_tracking import get_beats
 from music_features.cut_music import cut_music
@@ -71,4 +69,5 @@ def music_features(audio_path, duration, sampling_rate, t_before_start, downbeat
         plt.ylabel('Amplitude')
         plt.show()
 
-    return all_segments, t_start_sequence, t_downbeat_max, t_end_sequence
+    return all_segments, t_start_sequence, t_downbeat_max, t_end_sequence, time, aggregation
+
